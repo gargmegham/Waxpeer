@@ -1,27 +1,27 @@
-import React, { useState } from 'react'
-import Layout from '../components/Layout'
-import Router from 'next/router'
-import styles from '@/styles/Draft.module.css'
+import React, { useState } from "react";
+import Layout from "../components/Layout";
+import Router from "next/router";
+import styles from "@/styles/Draft.module.css";
 
 const Draft: React.FC = () => {
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [authorEmail, setAuthorEmail] = useState('')
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [authorEmail, setAuthorEmail] = useState("");
 
   const submitData = async (e: React.SyntheticEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      const body = { title, content, authorEmail }
+      const body = { title, content, authorEmail };
       await fetch(`/api/post`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-      })
-      await Router.push('/drafts')
+      });
+      await Router.push("/drafts");
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
   return (
     <Layout>
@@ -53,13 +53,13 @@ const Draft: React.FC = () => {
             type="submit"
             value="Create"
           />
-          <a className={styles.black} href="#" onClick={() => Router.push('/')}>
+          <a className={styles.black} href="#" onClick={() => Router.push("/")}>
             or Cancel
           </a>
         </form>
       </div>
     </Layout>
-  )
-}
+  );
+};
 
-export default Draft
+export default Draft;

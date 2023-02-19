@@ -2,7 +2,7 @@
   font-weight: bold;
 }
 
-.left a[data-active='true'] {
+.left a[data-active="true"] {
   color: gray;
 }
 

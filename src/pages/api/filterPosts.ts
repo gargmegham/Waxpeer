@@ -1,12 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import prisma from '../../lib/prisma'
+import type { NextApiRequest, NextApiResponse } from "next";
+import prisma from "../../lib/prisma";
 
 // GET /api/filterPosts?searchString=:searchString
 export default async function handle(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
-  const { searchString } = req.query
+  const { searchString } = req.query;
   const resultPosts = await prisma.post.findMany({
     where: {
       OR: [
@@ -26,6 +26,6 @@ export default async function handle(
         },
       ],
     },
-  })
-  return res.json(resultPosts)
+  });
+  return res.json(resultPosts);
 }

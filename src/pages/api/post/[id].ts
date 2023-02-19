@@ -1,20 +1,20 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import prisma from '../../../lib/prisma'
+import type { NextApiRequest, NextApiResponse } from "next";
+import prisma from "../../../lib/prisma";
 
 export default async function handle(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
-  const postId = req.query.id
+  const postId = req.query.id;
 
   switch (req.method) {
-    case 'DELETE':
-      return handleDELETE(postId, res)
+    case "DELETE":
+      return handleDELETE(postId, res);
 
     default:
       throw new Error(
-        `The HTTP ${req.method} method is not supported at this route.`,
-      )
+        `The HTTP ${req.method} method is not supported at this route.`
+      );
   }
 }
 
@@ -22,6 +22,6 @@ export default async function handle(
 async function handleDELETE(postId: unknown, res: NextApiResponse<any>) {
   const post = await prisma.post.delete({
     where: { id: Number(postId) },
-  })
-  return res.json(post)
+  });
+  return res.json(post);
 }
