@@ -3,19 +3,19 @@ import { GetServerSideProps } from "next";
 import Layout from "../components/Layout";
 import Post, { PostProps } from "../components/Post";
 import prisma from "../lib/prisma";
-import styles from "@/styles/Drafts.module.css";
+import styles from "@/styles/Inventory.module.css";
 
 type Props = {
-  drafts: PostProps[];
+  inventory: PostProps[];
 };
 
-const Drafts: React.FC<Props> = (props) => {
+const Inventory: React.FC<Props> = (props) => {
   return (
     <Layout>
       <div>
-        <h1>Drafts</h1>
+        <h1>My Waxpeer Inventory</h1>
         <main>
-          {props.drafts.map((post) => (
+          {props.inventory.map((post) => (
             <div key={post.id} className={styles.post}>
               <Post post={post} />
             </div>
@@ -27,13 +27,13 @@ const Drafts: React.FC<Props> = (props) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const drafts = await prisma.post.findMany({
+  const inventory = await prisma.post.findMany({
     where: { published: false },
     include: { author: true },
   });
   return {
-    props: { drafts },
+    props: { inventory },
   };
 };
 
-export default Drafts;
+export default Inventory;

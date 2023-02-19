@@ -8,14 +8,6 @@ const Header: React.FC = () => {
   const isActive: (pathname: string) => boolean = (pathname) =>
     router.pathname === pathname;
 
-  // onmount check if token is present
-  React.useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-    }
-  });
-
   return (
     <nav>
       <div className={styles.left}>
@@ -24,8 +16,11 @@ const Header: React.FC = () => {
             Listings
           </a>
         </Link>
-        <Link href="/drafts" legacyBehavior>
-          <a data-active={isActive("/drafts")}>Inventory</a>
+        <Link href="/inventory" legacyBehavior>
+          <a data-active={isActive("/inventory")}>
+            Inventory
+            {/* ant button */}
+          </a>
         </Link>
       </div>
       <div className={styles.right}>

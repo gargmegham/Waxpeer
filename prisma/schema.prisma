@@ -14,6 +14,55 @@ model User {
   password String?
   username String @unique
   posts Post[]
+  settings Settings[]
+  inventory InventoryItem[]
+}
+
+model Settings {
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  waxpeerApiKey String?
+  priceEmpireApiKey String?
+  botInterval Int?
+  paused Boolean @default(false)
+}
+
+model InventoryItem {
+  id Int @id @default(autoincrement())
+  name String
+  type String
+  icon_url String
+  uid String
+  listed Boolean @default(false)
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  settings ItemSettings[]
+}
+
+model ItemSettings {
+  id Int @id @default(autoincrement())
+  item InventoryItem @relation(fields: [itemId], references: [id])
+  itemId Int
+  source String
+  sourcePrice Int
+  lastUpdated DateTime
+  undercutPrice Int
+  undercutPercentage Int
+  currentPrice Int
+  undercutByPriceOrPercentage String
+  priceRangeMin Int
+  priceRangeMax Int
+  priceRangePercentage Int
+  whenNoOneToUndercutListUsing String
+}
+
+model ApiCallHistory {
+  id Int @id @default(autoincrement())
+  type String
+  url String
+  response String
+  createdAt DateTime @default(now())
 }
 
 model Post {
