@@ -8,24 +8,29 @@ const Header: React.FC = () => {
   const isActive: (pathname: string) => boolean = (pathname) =>
     router.pathname === pathname;
 
+  // onmount check if token is present
+  React.useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    }
+  });
+
   return (
     <nav>
       <div className={styles.left}>
         <Link href="/" legacyBehavior>
           <a className={styles.bold} data-active={isActive("/")}>
-            Blog
+            Listings
           </a>
         </Link>
         <Link href="/drafts" legacyBehavior>
-          <a data-active={isActive("/drafts")}>Drafts</a>
+          <a data-active={isActive("/drafts")}>Inventory</a>
         </Link>
       </div>
       <div className={styles.right}>
-        <Link href="/login" legacyBehavior>
-          <a data-active={isActive("/login")}>Login</a>
-        </Link>
-        <Link href="/create" legacyBehavior>
-          <a data-active={isActive("/create")}>+ Create draft</a>
+        <Link href="/settings" legacyBehavior>
+          <a data-active={isActive("/settings")}>Settings</a>
         </Link>
       </div>
     </nav>
