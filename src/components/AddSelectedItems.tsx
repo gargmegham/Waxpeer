@@ -197,7 +197,7 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
             title: "Undercut By Price Or Percentage",
             dataIndex: "undercutByPriceOrPercentage",
             render: (
-              undercutByPriceOrPercentage: number,
+              undercutByPriceOrPercentage: string,
               record: SelectedItem
             ) => {
               return (
