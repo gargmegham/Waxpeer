@@ -65,7 +65,14 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
   React.useEffect(() => {
     const fetchInventory = async () => {
       setLoading(true);
-      const res = await fetch("/api/inventory");
+      const token = localStorage.getItem("token");
+      const res = await fetch("/api/inventory", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       let data = await res.json();
       data.items = data.items.map((item: Item) => {
         return {

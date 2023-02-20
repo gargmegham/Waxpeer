@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../lib/prisma";
 
-// POST /api/user
 // Required fields in body: username, password
 export default async function handle(
   req: NextApiRequest,
@@ -32,9 +31,13 @@ export default async function handle(
     }
     // create a jwt for user
     const jwt = require("jsonwebtoken");
-    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { username },
+      "5687w7tfugyewtrf76%^&%$R^UY5&$%7697821689326192836",
+      {
+        expiresIn: "1h",
+      }
+    );
     return res.status(201).json({ token });
   } catch (e: any) {
     res.status(500).json({ error: e.message });

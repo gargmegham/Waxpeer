@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-// import prisma from "../../lib/prisma";
 
 // GET /api/inventory
 export default async function handle(
@@ -10,14 +9,24 @@ export default async function handle(
     if (req.method !== "GET") {
       return res.status(405).json({ error: "Method not allowed" });
     }
+    // verify bearer token
+    const jwt = require("jsonwebtoken");
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const signingKey = "5687w7tfugyewtrf76%^&%$R^UY5&$%7697821689326192836";
+    const decoded = jwt.verify(token, signingKey);
+    if (!decoded) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    // get inventory
     let myHeaders = new Headers();
     myHeaders.append("accept", "application/json");
-
     let requestOptions = {
       method: "GET",
       headers: myHeaders,
     };
-
     const response = await fetch(
       "https://api.waxpeer.com/v1/get-my-inventory?api=4d0de41b32c608b308b6e74956a0b57675ce6e83d6788e02cb64db8cc440f2f0&skip=0&game=csgo",
       requestOptions
