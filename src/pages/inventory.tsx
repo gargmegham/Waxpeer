@@ -95,7 +95,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
             source: null,
             sourcePrice: null,
             lastUpdated: null,
-            undercutPrice: null,
+            undercutPrice: 0.1,
             undercutPercentage: 1,
             currentPrice: null,
             undercutByPriceOrPercentage: 0,
