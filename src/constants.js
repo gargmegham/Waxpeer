@@ -1,5 +1,5 @@
 export const sources = [
-  { value: "buff", label: "buff" },
+  { value: "buff163", label: "buff163" },
   { value: "buff_rmb", label: "buff_rmb" },
   { value: "buff_buyrmb", label: "buff_buyrmb" },
   { value: "buff_avg7", label: "buff_avg7" },

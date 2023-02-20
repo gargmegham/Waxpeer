@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from "../components/Layout";
 import { GetServerSideProps } from "next";
-import { Table, Card, Button, Input } from "antd";
+import { Table, Spin, Card, Button, Input } from "antd";
 import prisma from "../lib/prisma";
 import AddSelectedItems from "../components/AddSelectedItems";
 import { message } from "antd";
@@ -94,7 +94,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
           return {
             ...item,
             active: true,
-            source: "buff",
+            source: "buff163",
             sourcePrice: null,
             lastUpdated: null,
             undercutPrice: 0.1,
@@ -113,7 +113,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
 
   return loading ? (
     <Layout>
-      <div>Loading...</div>
+      <Spin size="large" />
     </Layout>
   ) : (
     <Layout>
@@ -121,30 +121,17 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
         <Card
           title="My Inventory"
           extra={
-            <>
-              <Button
-                type="primary"
-                disabled={selectedItems.length === 0}
-                onClick={() => {
-                  selectedItems.length > 10
-                    ? message.error("You can only select 10 items at a time")
-                    : setShowModal(true);
-                }}
-              >
-                Confirm Selection
-              </Button>
-              <Button
-                style={{ marginLeft: "10px" }}
-                type="primary"
-                danger
-                disabled={selectedItems.length === 0}
-                onClick={() => {
-                  setSelectedItems([]);
-                }}
-              >
-                Clear Selection
-              </Button>
-            </>
+            <Button
+              type="primary"
+              disabled={selectedItems.length === 0}
+              onClick={() => {
+                selectedItems.length > 10
+                  ? message.error("You can only select 10 items at a time")
+                  : setShowModal(true);
+              }}
+            >
+              Confirm Selection
+            </Button>
           }
         >
           <Input
@@ -212,7 +199,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
         <AddSelectedItems
           showModal={showModal}
           setShowModal={setShowModal}
-          selectedItems={selectedItems}
+          selectedItem={selectedItems[0]}
         ></AddSelectedItems>
       )}
     </Layout>

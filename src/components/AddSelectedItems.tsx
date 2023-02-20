@@ -1,5 +1,14 @@
 import React from "react";
-import { Table, InputNumber, Switch, Card, Button, Select } from "antd";
+import {
+  Table,
+  InputNumber,
+  Switch,
+  Card,
+  Button,
+  Spin,
+  Select,
+  message,
+} from "antd";
 import { sources } from "../constants";
 
 type SelectedItem = {
@@ -25,11 +34,46 @@ type SelectedItem = {
 type Props = {
   showModal: boolean;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedItems: Array<SelectedItem>;
+  selectedItem: SelectedItem;
 };
 
-const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItems }) => {
-  return (
+const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
+  const [sourcePrices, setSourcePrices] = React.useState<any>({});
+  const [fetching, setFetching] = React.useState<boolean>(true);
+
+  React.useEffect(() => {
+    try {
+      const fetchSourcePrices = async () => {
+        var myHeaders = new Headers();
+        const hashed_name = encodeURIComponent(selectedItem.name);
+        const sourceString = sources.map((source) => source.value).join(",");
+        myHeaders.append("accept", "application/json");
+        const apiKey = "ab661d74-39c2-4d6b-9529-33c571a9ee45";
+        const res = await fetch(
+          `https://pricempire.com/api/v2/getItemByName/${hashed_name}?api_key=${apiKey}&currency=USD&source=${sourceString}`,
+          {
+            method: "GET",
+            headers: myHeaders,
+          }
+        );
+        const data = await res.json();
+        setFetching(false);
+        if (data.status === false) message.error(data.message);
+        else {
+          setSourcePrices(data.item.prices);
+          selectedItem.sourcePrice =
+            data.item.prices[selectedItem.source].sourcePrice;
+        }
+      };
+      fetchSourcePrices();
+    } catch (e) {
+      console.log(e);
+    }
+  });
+
+  return fetching ? (
+    <Spin size="large" />
+  ) : (
     <Card
       title="Add New Items To Bot"
       extra={
@@ -43,7 +87,7 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItems }) => {
                 headers: {
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ selectedItems }),
+                body: JSON.stringify({ selectedItem }),
               });
               setShowModal(false);
             }}
@@ -69,7 +113,7 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItems }) => {
           pageSizeOptions: ["50", "100"],
         }}
         scroll={{ x: 2200 }}
-        dataSource={selectedItems}
+        dataSource={[selectedItem]}
         columns={[
           {
             title: "Item",
@@ -91,7 +135,8 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItems }) => {
                   defaultValue={source}
                   style={{ width: 120 }}
                   onChange={(value) => {
-                    console.log(value);
+                    record.source = value;
+                    record.sourcePrice = sourcePrices[value].sourcePrice || 0;
                   }}
                   options={sources}
                 >
