@@ -164,6 +164,7 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
                   formatter={(value) =>
                     `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
+                  // @ts-ignore
                   parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                   onChange={(e) => {
                     record.undercutPrice = Number(e);
@@ -183,6 +184,7 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
                   size="large"
                   defaultValue={undercutPercentage}
                   formatter={(value) => `${value}%`}
+                  // @ts-ignore
                   parser={(value) => value!.replace("%", "")}
                   onChange={(e) => {
                     record.undercutPercentage = Number(e);
@@ -224,6 +226,7 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
                   formatter={(value) =>
                     `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
+                  // @ts-ignore
                   parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                   onChange={(e) => {
                     record.priceRangeMin = Number(e);
@@ -244,6 +247,7 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
                   formatter={(value) =>
                     `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
+                  // @ts-ignore
                   parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                   onChange={(e) => {
                     record.priceRangeMax = Number(e);
@@ -260,6 +264,7 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
                 <InputNumber
                   defaultValue={priceRangePercentage}
                   formatter={(value) => `${value}%`}
+                  // @ts-ignore
                   parser={(value) => value!.replace("%", "")}
                   onChange={(e) => {
                     record.priceRangePercentage = Number(e);
