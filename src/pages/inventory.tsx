@@ -196,6 +196,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
                     value: "Inactive",
                   },
                 ],
+                // @ts-ignore
                 onFilter: (value: string, record: Item) =>
                   record.active.indexOf(value) === 0,
               },
