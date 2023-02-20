@@ -4,6 +4,7 @@ import { GetServerSideProps } from "next";
 import { Table, Card, Button, Col, Row } from "antd";
 import prisma from "../lib/prisma";
 import AddSelectedItems from "../components/AddSelectedItems";
+import { message } from "antd";
 
 type Item = {
   item_id: number;
@@ -27,7 +28,7 @@ type SelectedItem = {
   undercutPrice: number;
   undercutPercentage: number;
   currentPrice: number;
-  undercutByPriceOrPercentage: number;
+  undercutByPriceOrPercentage: string;
   priceRangeMin: number;
   priceRangeMax: number;
   priceRangePercentage: number;
@@ -98,11 +99,11 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
             undercutPrice: 0.1,
             undercutPercentage: 1,
             currentPrice: null,
-            undercutByPriceOrPercentage: 0,
+            undercutByPriceOrPercentage: "price",
             priceRangeMin: null,
             priceRangeMax: null,
             priceRangePercentage: 110,
-            whenNoOneToUndercutListUsing: "percentage",
+            whenNoOneToUndercutListUsing: "max",
           };
         })
       );
@@ -123,7 +124,9 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
               type="primary"
               disabled={selectedItems.length === 0}
               onClick={() => {
-                setShowModal(true);
+                selectedItems.length > 10
+                  ? message.error("You can only select 10 items at a time")
+                  : setShowModal(true);
               }}
             >
               Confirm Selection
@@ -131,6 +134,11 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
           }
         >
           <Table
+            pagination={{
+              pageSize: 50,
+              showSizeChanger: true,
+              pageSizeOptions: ["50", "100"],
+            }}
             rowSelection={{
               type: "checkbox",
               ...rowSelection,

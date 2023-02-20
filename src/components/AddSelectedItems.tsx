@@ -15,7 +15,7 @@ type SelectedItem = {
   undercutPrice: number;
   undercutPercentage: number;
   currentPrice: number;
-  undercutByPriceOrPercentage: number;
+  undercutByPriceOrPercentage: string;
   priceRangeMin: number;
   priceRangeMax: number;
   priceRangePercentage: number;
@@ -64,6 +64,11 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItems }) => {
       }
     >
       <Table
+        pagination={{
+          pageSize: 50,
+          showSizeChanger: true,
+          pageSizeOptions: ["50", "100"],
+        }}
         scroll={{ x: 2200 }}
         dataSource={selectedItems}
         columns={[
@@ -151,12 +156,14 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItems }) => {
             ) => {
               return (
                 <Switch
-                  defaultChecked={undercutByPriceOrPercentage === 1}
+                  defaultChecked={undercutByPriceOrPercentage === "percentage"}
                   onChange={(checked) => {
-                    record.undercutByPriceOrPercentage = checked ? 1 : 0;
+                    record.undercutByPriceOrPercentage = !checked
+                      ? "price"
+                      : "percentage";
                   }}
-                  checkedChildren="Price"
-                  unCheckedChildren="Percentage"
+                  checkedChildren="Percentage"
+                  unCheckedChildren="Price"
                 />
               );
             },
@@ -232,8 +239,8 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItems }) => {
                       ? "max"
                       : "percentage";
                   }}
-                  checkedChildren="Max"
                   unCheckedChildren="Percentage"
+                  checkedChildren="Max"
                 />
               );
             },
