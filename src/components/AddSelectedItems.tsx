@@ -38,13 +38,12 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItems }) => {
             style={{ marginRight: "10px" }}
             type="primary"
             onClick={async () => {
-              const itemIds = selectedItems.map((item: any) => item.item_id);
-              await fetch("/api/active-items", {
+              await fetch("/api/item", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ itemIds }),
+                body: JSON.stringify({ selectedItems }),
               });
               setShowModal(false);
             }}

@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from "../components/Layout";
 import { GetServerSideProps } from "next";
-import { Table, Card, Button, Col, Row } from "antd";
+import { Table, Card, Button, Input } from "antd";
 import prisma from "../lib/prisma";
 import AddSelectedItems from "../components/AddSelectedItems";
 import { message } from "antd";
@@ -53,6 +53,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
   const [selectedItems, setSelectedItems] = React.useState<Array<SelectedItem>>(
     []
   );
+  const [search, setSearch] = React.useState<string>("");
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [inventory, setInventory] = React.useState<Inventory>({
     count: 0,
@@ -93,7 +94,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
           return {
             ...item,
             active: true,
-            source: null,
+            source: "buff",
             sourcePrice: null,
             lastUpdated: null,
             undercutPrice: 0.1,
@@ -120,19 +121,38 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
         <Card
           title="My Inventory"
           extra={
-            <Button
-              type="primary"
-              disabled={selectedItems.length === 0}
-              onClick={() => {
-                selectedItems.length > 10
-                  ? message.error("You can only select 10 items at a time")
-                  : setShowModal(true);
-              }}
-            >
-              Confirm Selection
-            </Button>
+            <>
+              <Button
+                type="primary"
+                disabled={selectedItems.length === 0}
+                onClick={() => {
+                  selectedItems.length > 10
+                    ? message.error("You can only select 10 items at a time")
+                    : setShowModal(true);
+                }}
+              >
+                Confirm Selection
+              </Button>
+              <Button
+                style={{ marginLeft: "10px" }}
+                type="primary"
+                danger
+                disabled={selectedItems.length === 0}
+                onClick={() => {
+                  setSelectedItems([]);
+                }}
+              >
+                Clear Selection
+              </Button>
+            </>
           }
         >
+          <Input
+            placeholder="Search by name..."
+            style={{ width: "100%", marginBottom: "10px" }}
+            allowClear
+            onChange={(e) => setSearch(e.target.value)}
+          />
           <Table
             pagination={{
               pageSize: 50,
@@ -140,27 +160,50 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
               pageSizeOptions: ["50", "100"],
             }}
             rowSelection={{
-              type: "checkbox",
+              type: "radio",
               ...rowSelection,
             }}
-            dataSource={inventory.items}
+            dataSource={inventory.items.filter(
+              (item: Item) =>
+                item.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
+            )}
             columns={[
               {
                 title: "Item",
                 dataIndex: "item_id",
                 key: "item_id",
+                sortDirections: ["descend", "ascend"],
+                sorter: (a: Item, b: Item) => a.item_id - b.item_id,
               },
               {
                 title: "Name",
                 dataIndex: "name",
+                defaultSortOrder: "descend",
+                sortDirections: ["descend", "ascend"],
+                sorter: (a: Item, b: Item) => a.name.localeCompare(b.name),
               },
               {
                 title: "Type",
                 dataIndex: "type",
+                defaultSortOrder: "descend",
+                sortDirections: ["descend", "ascend"],
+                sorter: (a: Item, b: Item) => a.type.localeCompare(b.type),
               },
               {
                 title: "Active",
                 dataIndex: "active",
+                filters: [
+                  {
+                    text: "Active",
+                    value: "Active",
+                  },
+                  {
+                    text: "Inactive",
+                    value: "Inactive",
+                  },
+                ],
+                onFilter: (value: string, record: Item) =>
+                  record.active.indexOf(value) === 0,
               },
             ]}
           />
