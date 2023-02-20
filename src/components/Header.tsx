@@ -10,22 +10,15 @@ const Header: React.FC = () => {
 
   return (
     <nav>
-      <div className={styles.left}>
+      <div className={styles.right}>
         <Link href="/" legacyBehavior>
-          <a className={styles.bold} data-active={isActive("/")}>
-            Listings
-          </a>
+          <a className={isActive("/") ? styles.bold : ""}>Listings</a>
         </Link>
         <Link href="/inventory" legacyBehavior>
-          <a data-active={isActive("/inventory")}>
-            Inventory
-            {/* ant button */}
-          </a>
+          <a className={isActive("/inventory") ? styles.bold : ""}>Inventory</a>
         </Link>
-      </div>
-      <div className={styles.right}>
         <Link href="/settings" legacyBehavior>
-          <a data-active={isActive("/settings")}>Settings</a>
+          <a className={isActive("/settings") ? styles.bold : ""}>Settings</a>
         </Link>
       </div>
     </nav>
