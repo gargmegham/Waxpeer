@@ -39,7 +39,7 @@ export default async function handle(
           }
         );
         const data = await result.json();
-        response.items[name] = data;
+        response.items[item.name] = data;
         response.status = response.status && data.status;
         if (data.status === false)
           response.message = response.message + data.message + " ";
