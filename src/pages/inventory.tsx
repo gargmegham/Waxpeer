@@ -7,7 +7,7 @@ import AddSelectedItems from "../components/AddSelectedItems";
 import { message } from "antd";
 
 type Item = {
-  item_id: number;
+  item_id: string;
   icon_url: string;
   name: string;
   type: string;

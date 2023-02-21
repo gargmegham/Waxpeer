@@ -21,7 +21,7 @@ type SourcePrices = {
 };
 
 export type SelectedItem = {
-  item_id: number;
+  item_id: string;
   icon_url: string;
   name: string;
   type: string;
