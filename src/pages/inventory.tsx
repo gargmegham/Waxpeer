@@ -7,7 +7,7 @@ import AddSelectedItems from "../components/AddSelectedItems";
 import { message } from "antd";
 
 type Item = {
-  item_id: string;
+  item_id: number;
   icon_url: string;
   name: string;
   type: string;
@@ -22,7 +22,7 @@ type Inventory = {
 };
 
 type ActiveItem = {
-  item_id: string;
+  item_id: number;
 };
 
 type Props = {
@@ -59,7 +59,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
           key: item.item_id,
           active: activeItems.some(
             (activeItem: ActiveItem) =>
-              activeItem.item_id === String(item.item_id)
+              String(activeItem.item_id) === String(item.item_id)
           )
             ? "Active"
             : "Inactive",
@@ -176,7 +176,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const activeItems: Array<ActiveItem> = await prisma.item.findMany({
+  const activeItems: Array<any> = await prisma.item.findMany({
     where: { active: true },
     select: {
       item_id: true,
