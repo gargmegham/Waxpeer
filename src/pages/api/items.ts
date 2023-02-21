@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { signingKey } from "../../constants";
 import prisma from "../../lib/prisma";
-import { SelectedItem } from "../../components/AddSelectedItems";
+import { SelectedItem } from "../../types";
 
 // POST /api/priceempire
 export default async function handle(
