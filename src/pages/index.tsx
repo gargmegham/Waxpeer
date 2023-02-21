@@ -1,13 +1,15 @@
 import React from "react";
-import { Table, InputNumber, Switch, Card, Select } from "antd";
+import { Table, InputNumber, Switch, Card, Button } from "antd";
 import Layout from "../components/Layout";
 import prisma from "../lib/prisma";
+import EditOutlined from "@ant-design/icons/EditOutlined";
+import DeleteOutlined from "@ant-design/icons/DeleteOutlined";
 import { GetServerSideProps } from "next";
 
 const Listings: React.FC<any> = ({ items }) => {
   return (
     <Layout>
-      <Card title="Live Trades">
+      <Card title="Currently Live Bot Trades">
         <Table
           pagination={{
             pageSize: 50,
@@ -22,6 +24,23 @@ const Listings: React.FC<any> = ({ items }) => {
               dataIndex: "name",
               fixed: "left",
               width: 250,
+            },
+            {
+              title: "Edit/Delete",
+              fixed: "left",
+              width: 150,
+              render: (val: string, record: any, index: number) => {
+                return (
+                  <>
+                    <Button
+                      style={{ marginRight: "6px" }}
+                      type="primary"
+                      icon={<EditOutlined />}
+                    ></Button>
+                    <Button danger icon={<DeleteOutlined />}></Button>
+                  </>
+                );
+              },
             },
             {
               title: "Source",
