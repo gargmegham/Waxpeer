@@ -5,8 +5,12 @@ import prisma from "../lib/prisma";
 import EditOutlined from "@ant-design/icons/EditOutlined";
 import DeleteOutlined from "@ant-design/icons/DeleteOutlined";
 import { GetServerSideProps } from "next";
+import EditItemModal from "../components/EditItemModal";
 
 const Listings: React.FC<any> = ({ items }) => {
+  const [editItemModalVisible, setEditItemModalVisible] =
+    React.useState<boolean>(false);
+  const [editItemModalItem, setEditItemModalItem] = React.useState<any>(null);
   return (
     <Layout>
       <Card title="Currently Live Bot Trades">
@@ -36,6 +40,10 @@ const Listings: React.FC<any> = ({ items }) => {
                       style={{ marginRight: "6px" }}
                       type="primary"
                       icon={<EditOutlined />}
+                      onClick={() => {
+                        setEditItemModalItem(record);
+                        setEditItemModalVisible(true);
+                      }}
                     ></Button>
                     <Button danger icon={<DeleteOutlined />}></Button>
                   </>
@@ -193,9 +201,6 @@ const Listings: React.FC<any> = ({ items }) => {
                     formatter={(value) => `${value}%`}
                     // @ts-ignore
                     parser={(value) => value!.replace("%", "")}
-                    // onChange={(e) => {
-                    //   record.priceRangePercentage = Number(e);
-                    // }}
                   />
                 );
               },
@@ -218,6 +223,13 @@ const Listings: React.FC<any> = ({ items }) => {
           ]}
         />
       </Card>
+      {editItemModalVisible ? (
+        <EditItemModal
+          showModal={editItemModalVisible}
+          setShowModal={setEditItemModalVisible}
+          selectedItem={editItemModalItem}
+        />
+      ) : null}
     </Layout>
   );
 };

@@ -52,3 +52,9 @@ export type AddSelectedItemsProps = {
   setShowSelectedItems: React.Dispatch<React.SetStateAction<boolean>>;
   selectedItems: Array<Item>;
 };
+
+export type EditItemModalProps = {
+  showModal: boolean;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedItem: SelectedItem;
+};
