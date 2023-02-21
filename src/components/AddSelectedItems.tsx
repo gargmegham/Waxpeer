@@ -9,21 +9,29 @@ import {
   Select,
   message,
 } from "antd";
-import { sources } from "../constants";
+import mockedResponse from "../mockedResponse";
+import { Item } from "../pages/inventory";
+
+type SourcePrice = {
+  sourcePrice: number;
+};
+
+type SourcePrices = {
+  [key: string]: SourcePrice;
+};
 
 type SelectedItem = {
   item_id: number;
   icon_url: string;
   name: string;
   type: string;
-  active: string;
   steam_price: object;
   source: string;
   sourcePrice: number;
+  prices: SourcePrices;
   lastUpdated: Date;
   undercutPrice: number;
   undercutPercentage: number;
-  currentPrice: number;
   undercutByPriceOrPercentage: string;
   priceRangeMin: number;
   priceRangeMax: number;
@@ -32,97 +40,122 @@ type SelectedItem = {
 };
 
 type Props = {
-  showModal: boolean;
-  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedItem: SelectedItem;
+  setShowSelectedItems: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedItems: Array<Item>;
 };
 
-// call api only once
-
-const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
-  const [sourcePrices, setSourcePrices] = React.useState<any>({});
+const AddSelectedItems: React.FC<Props> = ({
+  setShowSelectedItems,
+  selectedItems,
+}) => {
+  const [items, setItems] = React.useState<Array<SelectedItem>>(
+    selectedItems.map((item: Item) => {
+      return {
+        ...item,
+        source: "buff163",
+        prices: {
+          buff163: {
+            sourcePrice: 0,
+          },
+        },
+        sourcePrice: 0,
+        lastUpdated: new Date(),
+        undercutPrice: 0.1,
+        undercutPercentage: 1,
+        undercutByPriceOrPercentage: "price",
+        priceRangeMin: 0,
+        priceRangeMax: 0,
+        priceRangePercentage: 110,
+        whenNoOneToUndercutListUsing: "max",
+      };
+    })
+  );
   const [fetching, setFetching] = React.useState<boolean>(true);
+
+  const submit = async () => {
+    await fetch("/api/item", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ selectedItems }),
+    });
+    setShowSelectedItems(false);
+  };
+
+  const actions = (
+    <>
+      <Button style={{ marginRight: "10px" }} type="primary" onClick={submit}>
+        Submit
+      </Button>
+      <Button
+        type="primary"
+        danger
+        onClick={() => {
+          setShowSelectedItems(false);
+        }}
+      >
+        Cancel
+      </Button>
+    </>
+  );
 
   React.useEffect(() => {
     try {
       const fetchSourcePrices = async () => {
-        setFetching(false);
-        const token = localStorage.getItem("token");
-        const res = await fetch("/api/priceempire", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ name: selectedItem.name }),
-        });
-        const data = await res.json();
-        if (data.status === false) message.error(data.message);
-        else {
-          setSourcePrices(data.item.prices);
-          selectedItem.sourcePrice =
-            data.item.prices[selectedItem.source].sourcePrice;
+        let data: any;
+        if (process.env.HOST_TYPE !== "localhost") {
+          const res = await fetch("/api/priceempire", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({ selectedItems }),
+          });
+          data = await res.json();
         }
+        if (data.status === false) {
+          // if error
+          message.error(data.message);
+          setShowSelectedItems(false);
+          return;
+        }
+        setItems(
+          // if success
+          (value) =>
+            value.map((item: SelectedItem) => {
+              return {
+                ...item,
+                sourcePrice: data.items[item.name].item.prices[item.source]
+                  .sourcePrice
+                  ? data.items[item.name].item.prices[item.source].sourcePrice /
+                    100
+                  : 0,
+                prices: data.items[item.name].item.prices,
+              };
+            }) as Array<SelectedItem>
+        );
       };
-      // call api only once
-      if (Object.keys(sourcePrices).length === 0) {
-        fetchSourcePrices();
-      }
-    } catch (e) {
-      console.log(e);
+      fetchSourcePrices();
+    } finally {
+      setFetching(false);
     }
-  });
+  }, []);
 
   return fetching ? (
     <Spin size="large" />
   ) : (
-    <Card
-      title="Add New Items To Bot"
-      extra={
-        <>
-          <Button
-            style={{ marginRight: "10px" }}
-            type="primary"
-            onClick={async () => {
-              await fetch("/api/item", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ selectedItem }),
-              });
-              setShowModal(false);
-            }}
-          >
-            Submit
-          </Button>
-          <Button
-            type="primary"
-            danger
-            onClick={() => {
-              setShowModal(false);
-            }}
-          >
-            Cancel
-          </Button>
-        </>
-      }
-    >
+    <Card title="Add New Items To Bot" extra={actions}>
       <Table
         pagination={{
           pageSize: 50,
           showSizeChanger: true,
           pageSizeOptions: ["50", "100"],
         }}
-        scroll={{ x: 2200 }}
-        dataSource={[selectedItem]}
+        scroll={{ x: 1400 }}
+        dataSource={items}
         columns={[
-          {
-            title: "Item",
-            dataIndex: "item_id",
-            key: "item_id",
-            fixed: "left",
-          },
           {
             title: "Name",
             dataIndex: "name",
@@ -130,33 +163,49 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
           },
           {
             title: "Source",
+            fixed: "left",
             dataIndex: "source",
             render: (source: string, record: SelectedItem, index: number) => {
               return (
+                // options will be the keys of the prices object where sourcePrice is not null
                 <Select
                   defaultValue={source}
-                  style={{ width: 120 }}
-                  onChange={(value) => {
-                    record.source = value;
-                    record.sourcePrice = sourcePrices[value].sourcePrice || 0;
+                  style={{ width: 230 }}
+                  options={Object.keys(record.prices)
+                    .filter((key) => record.prices[key].sourcePrice !== null)
+                    .map((key) => {
+                      return {
+                        value: key,
+                        label: `${`$ ${
+                          record.prices[key].sourcePrice / 100
+                        }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} (${key})`,
+                      };
+                    })}
+                  onChange={(e) => {
+                    setItems(
+                      items.map((item: SelectedItem, i: number) => {
+                        if (i === index) {
+                          return {
+                            ...item,
+                            source: e,
+                            sourcePrice: record.prices[e].sourcePrice / 100,
+                          };
+                        }
+                        return item;
+                      })
+                    );
                   }}
-                  options={sources}
                 >
                   Source
                 </Select>
               );
             },
-          },
-          {
-            title: "Source Price",
-            dataIndex: "sourcePrice",
-            render: (sourcePrice: number) => {
-              return <span>{sourcePrice || "-"}</span>;
-            },
+            width: 260,
           },
           {
             title: "Undercut Price",
             dataIndex: "undercutPrice",
+            width: 120,
             render: (undercutPrice: number, record: SelectedItem) => {
               return (
                 <InputNumber
@@ -178,6 +227,7 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
           {
             title: "Undercut Percentage",
             dataIndex: "undercutPercentage",
+            width: 120,
             render: (undercutPercentage: number, record: SelectedItem) => {
               return (
                 <InputNumber
@@ -196,29 +246,31 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
             },
           },
           {
-            title: "Undercut By Price Or Percentage",
+            title: "Undercut By",
             dataIndex: "undercutByPriceOrPercentage",
+            width: 130,
             render: (
               undercutByPriceOrPercentage: string,
               record: SelectedItem
             ) => {
               return (
                 <Switch
-                  defaultChecked={undercutByPriceOrPercentage === "percentage"}
+                  defaultChecked={undercutByPriceOrPercentage === "price"}
                   onChange={(checked) => {
-                    record.undercutByPriceOrPercentage = !checked
+                    record.undercutByPriceOrPercentage = checked
                       ? "price"
                       : "percentage";
                   }}
-                  checkedChildren="Percentage"
-                  unCheckedChildren="Price"
+                  unCheckedChildren="Percentage"
+                  checkedChildren="Price"
                 />
               );
             },
           },
           {
-            title: "Price Range Min",
+            title: "Range Min",
             dataIndex: "priceRangeMin",
+            width: 130,
             render: (priceRangeMin: number, record: SelectedItem) => {
               return (
                 <InputNumber
@@ -238,7 +290,8 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
             },
           },
           {
-            title: "Price Range Max",
+            title: "Range Max",
+            width: 130,
             dataIndex: "priceRangeMax",
             render: (priceRangeMax: number, record: SelectedItem) => {
               return (
@@ -259,7 +312,8 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
             },
           },
           {
-            title: "Price Range Percentage",
+            title: "Price Percentage",
+            width: 130,
             dataIndex: "priceRangePercentage",
             render: (priceRangePercentage: number, record: SelectedItem) => {
               return (
@@ -276,8 +330,9 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
             },
           },
           {
-            title: "When No One To Undercut List Using",
+            title: "List Using (When No One To Undercut)",
             dataIndex: "whenNoOneToUndercutListUsing",
+            width: 180,
             render: (
               whenNoOneToUndercutListUsing: string,
               record: SelectedItem
@@ -290,8 +345,8 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
                       ? "max"
                       : "percentage";
                   }}
-                  unCheckedChildren="Percentage"
-                  checkedChildren="Max"
+                  unCheckedChildren="Price Percentage"
+                  checkedChildren="Range Max"
                 />
               );
             },

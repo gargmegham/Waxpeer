@@ -78,3 +78,5 @@ export const sources = [
   { value: "youpin_rmb", label: "youpin_rmb" },
   { value: "mannco", label: "mannco" },
 ];
+export const sourceString = sources.map((source) => source.value).join(",");
+export const signingKey = "5687w7tfugyewtrf76%^&%$R^UY5&$%7697821689326192836";

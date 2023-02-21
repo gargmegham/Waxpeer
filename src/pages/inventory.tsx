@@ -15,26 +15,6 @@ type Item = {
   steam_price: object;
 };
 
-type SelectedItem = {
-  item_id: number;
-  icon_url: string;
-  name: string;
-  type: string;
-  active: string;
-  steam_price: object;
-  source: string;
-  sourcePrice: number;
-  lastUpdated: Date;
-  undercutPrice: number;
-  undercutPercentage: number;
-  currentPrice: number;
-  undercutByPriceOrPercentage: string;
-  priceRangeMin: number;
-  priceRangeMax: number;
-  priceRangePercentage: number;
-  whenNoOneToUndercutListUsing: string;
-};
-
 type Inventory = {
   count: number;
   success: boolean;
@@ -50,11 +30,10 @@ type Props = {
 };
 
 const MyInventory: React.FC<Props> = ({ activeItems }) => {
-  const [selectedItems, setSelectedItems] = React.useState<Array<SelectedItem>>(
-    []
-  );
+  const [selectedItems, setSelectedItems] = React.useState<Array<Item>>([]);
   const [search, setSearch] = React.useState<string>("");
-  const [showModal, setShowModal] = React.useState<boolean>(false);
+  const [showSelectedItems, setShowSelectedItems] =
+    React.useState<boolean>(false);
   const [inventory, setInventory] = React.useState<Inventory>({
     count: 0,
     items: [],
@@ -95,26 +74,8 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
     getCheckboxProps: (record: Item) => ({
       disabled: record.active === "Active",
     }),
-    onChange: (selectedRowKeys: any, selectedRows: any) => {
-      setSelectedItems(
-        selectedRows.map((item: Item) => {
-          return {
-            ...item,
-            active: true,
-            source: "buff163",
-            sourcePrice: null,
-            lastUpdated: null,
-            undercutPrice: 0.1,
-            undercutPercentage: 1,
-            currentPrice: null,
-            undercutByPriceOrPercentage: "price",
-            priceRangeMin: null,
-            priceRangeMax: null,
-            priceRangePercentage: 110,
-            whenNoOneToUndercutListUsing: "max",
-          };
-        })
-      );
+    onChange: (selectedRowKeys: any, selectedRows: Array<Item>) => {
+      setSelectedItems(selectedRows);
     },
   };
 
@@ -124,7 +85,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
     </Layout>
   ) : (
     <Layout>
-      {!showModal ? (
+      {!showSelectedItems ? (
         <Card
           title="My Inventory"
           extra={
@@ -134,7 +95,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
               onClick={() => {
                 selectedItems.length > 10
                   ? message.error("You can only select 10 items at a time")
-                  : setShowModal(true);
+                  : setShowSelectedItems(true);
               }}
             >
               Confirm Selection
@@ -154,7 +115,7 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
               pageSizeOptions: ["50", "100"],
             }}
             rowSelection={{
-              type: "radio",
+              type: "checkbox",
               ...rowSelection,
             }}
             dataSource={inventory.items.filter(
@@ -205,9 +166,8 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
         </Card>
       ) : (
         <AddSelectedItems
-          showModal={showModal}
-          setShowModal={setShowModal}
-          selectedItem={selectedItems[0]}
+          setShowSelectedItems={setShowSelectedItems}
+          selectedItems={selectedItems}
         ></AddSelectedItems>
       )}
     </Layout>
@@ -227,3 +187,4 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 export default MyInventory;
+export type { Item, ActiveItem };

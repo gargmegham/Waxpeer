@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { signingKey } from "../../constants";
 
 // GET /api/inventory
 export default async function handle(
@@ -13,7 +14,6 @@ export default async function handle(
       if (!token) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const signingKey = "5687w7tfugyewtrf76%^&%$R^UY5&$%7697821689326192836";
       const decoded = jwt.verify(token, signingKey);
       if (!decoded) {
         return res.status(401).json({ error: "Unauthorized" });
