@@ -104,18 +104,16 @@ const AddSelectedItems: React.FC<Props> = ({
   React.useEffect(() => {
     try {
       const fetchSourcePrices = async () => {
-        let data: any = mockedResponse;
-        // if (process.env.HOST_TYPE !== "localhost") {
-        //   const res = await fetch("/api/priceempire", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //       Authorization: `Bearer ${localStorage.getItem("token")}`,
-        //     },
-        //     body: JSON.stringify({ selectedItems }),
-        //   });
-        //   data = await res.json();
-        // }
+        let data: any;
+        const res = await fetch("/api/priceempire", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ selectedItems }),
+        });
+        data = await res.json();
         setFetching(false);
         if (data.status === false) {
           // if error
