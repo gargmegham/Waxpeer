@@ -22,7 +22,7 @@ type Inventory = {
 };
 
 type ActiveItem = {
-  item_id: number;
+  item_id: string;
 };
 
 type Props = {
@@ -58,7 +58,8 @@ const MyInventory: React.FC<Props> = ({ activeItems }) => {
           ...item,
           key: item.item_id,
           active: activeItems.some(
-            (activeItem: ActiveItem) => activeItem.item_id === item.item_id
+            (activeItem: ActiveItem) =>
+              activeItem.item_id === String(item.item_id)
           )
             ? "Active"
             : "Inactive",
@@ -187,4 +188,4 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 export default MyInventory;
-export type { Item, ActiveItem };
+export type { Item };

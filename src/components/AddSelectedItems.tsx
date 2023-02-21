@@ -20,7 +20,7 @@ type SourcePrices = {
   [key: string]: SourcePrice;
 };
 
-type SelectedItem = {
+export type SelectedItem = {
   item_id: number;
   icon_url: string;
   name: string;
@@ -73,12 +73,13 @@ const AddSelectedItems: React.FC<Props> = ({
   const [fetching, setFetching] = React.useState<boolean>(true);
 
   const submit = async () => {
-    await fetch("/api/item", {
+    await fetch("/api/items", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      body: JSON.stringify({ selectedItems }),
+      body: JSON.stringify({ items }),
     });
     setShowSelectedItems(false);
   };
@@ -103,18 +104,19 @@ const AddSelectedItems: React.FC<Props> = ({
   React.useEffect(() => {
     try {
       const fetchSourcePrices = async () => {
-        let data: any;
-        if (process.env.HOST_TYPE !== "localhost") {
-          const res = await fetch("/api/priceempire", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            body: JSON.stringify({ selectedItems }),
-          });
-          data = await res.json();
-        }
+        let data: any = mockedResponse;
+        // if (process.env.HOST_TYPE !== "localhost") {
+        //   const res = await fetch("/api/priceempire", {
+        //     method: "POST",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       Authorization: `Bearer ${localStorage.getItem("token")}`,
+        //     },
+        //     body: JSON.stringify({ selectedItems }),
+        //   });
+        //   data = await res.json();
+        // }
+        setFetching(false);
         if (data.status === false) {
           // if error
           message.error(data.message);
@@ -138,8 +140,8 @@ const AddSelectedItems: React.FC<Props> = ({
         );
       };
       fetchSourcePrices();
-    } finally {
-      setFetching(false);
+    } catch (e) {
+      console.log("error", e);
     }
   }, []);
 

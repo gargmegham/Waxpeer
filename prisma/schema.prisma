@@ -29,16 +29,16 @@ model Item {
   name String
   type String
   active Boolean @default(true)
-  item_id Int
+  item_id String
   source String
-  sourcePrice Int
+  sourcePrice Float
   lastUpdated DateTime
-  undercutPrice Int
-  undercutPercentage Int
-  currentPrice Int
+  undercutPrice Float
+  undercutPercentage Float
+  currentPrice Float
   undercutByPriceOrPercentage String
-  priceRangeMin Int
-  priceRangeMax Int
-  priceRangePercentage Int
+  priceRangeMin Float
+  priceRangeMax Float
+  priceRangePercentage Float
   whenNoOneToUndercutListUsing String
 }
