@@ -1,12 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { sources } from "../../constants";
 
-// GET /api/inventory
+type Source = {
+  value: string;
+  label: string;
+};
+
+// POST /api/priceempire
 export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
-    if (req.method === "GET") {
+    if (req.method === "POST") {
       // verify bearer token
       const jwt = require("jsonwebtoken");
       const token = req.headers.authorization?.split(" ")[1];
@@ -18,18 +24,21 @@ export default async function handle(
       if (!decoded) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      // get inventory
+      const sourceString: string = sources
+        .map((source: Source) => source.value)
+        .join(",");
+      const apiKey: string = "ab661d74-39c2-4d6b-9529-33c571a9ee45";
+      const name: string = JSON.parse(req.body).name;
       let myHeaders = new Headers();
       myHeaders.append("accept", "application/json");
-      let requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-      };
-      const response = await fetch(
-        "https://api.waxpeer.com/v1/get-my-inventory?api=4d0de41b32c608b308b6e74956a0b57675ce6e83d6788e02cb64db8cc440f2f0&skip=0&game=csgo",
-        requestOptions
+      const result = await fetch(
+        `https://pricempire.com/api/v2/getItemByName/${name}?api_key=${apiKey}&currency=USD&source=${sourceString}`,
+        {
+          method: "GET",
+          headers: myHeaders,
+        }
       );
-      const data = await response.json();
+      const data = await result.json();
       return res.status(200).json(data);
     }
   } catch (e: any) {

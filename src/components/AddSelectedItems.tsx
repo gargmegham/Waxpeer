@@ -44,20 +44,17 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
   React.useEffect(() => {
     try {
       const fetchSourcePrices = async () => {
-        var myHeaders = new Headers();
-        const hashed_name = encodeURIComponent(selectedItem.name);
-        const sourceString = sources.map((source) => source.value).join(",");
-        myHeaders.append("accept", "application/json");
-        const apiKey = "ab661d74-39c2-4d6b-9529-33c571a9ee45";
-        const res = await fetch(
-          `https://pricempire.com/api/v2/getItemByName/${hashed_name}?api_key=${apiKey}&currency=USD&source=${sourceString}`,
-          {
-            method: "GET",
-            headers: myHeaders,
-          }
-        );
-        const data = await res.json();
         setFetching(false);
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api/priceempire", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: encodeURIComponent(selectedItem.name) }),
+        });
+        const data = await res.json();
         if (data.status === false) message.error(data.message);
         else {
           setSourcePrices(data.item.prices);
