@@ -3,8 +3,18 @@ import Layout from "../components/Layout";
 import { GetServerSideProps } from "next";
 import { Card, Row } from "antd";
 import React from "react";
+/*
+model Settings {
+  id Int @id @default(autoincrement())
+  userId Int
+  waxpeerApiKey String?
+  priceEmpireApiKey String?
+  botInterval Int?
+  paused Boolean @default(false)
+} */
 
 const Settings: React.FC<any> = ({ settings }) => {
+  console.log(settings);
   return (
     <Layout>
       <Card title="Settings">
@@ -17,7 +27,11 @@ const Settings: React.FC<any> = ({ settings }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const settings: any = await prisma.settings.findMany();
+  const settings = await prisma.settings.findUnique({
+    where: {
+      id: 1,
+    },
+  });
   return {
     props: {
       settings,

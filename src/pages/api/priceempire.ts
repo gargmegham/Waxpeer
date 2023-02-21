@@ -1,6 +1,7 @@
+import prisma from "../../lib/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { sourceString, signingKey } from "../../constants";
-import { Item } from "../inventory";
+import { Item } from "../../types";
 
 // POST /api/priceempire
 export default async function handle(
@@ -20,7 +21,12 @@ export default async function handle(
         return res.status(401).json({ error: "Unauthorized" });
       }
       // fetch data from priceempire
-      const apiKey: string = "ab661d74-39c2-4d6b-9529-33c571a9ee45";
+      const settings = await prisma.settings.findUnique({
+        where: {
+          id: 1,
+        },
+      });
+      const apiKey: string = settings?.priceEmpireApiKey || "";
       const selectedItems: Array<Item> = req.body.selectedItems;
       const response: any = {
         status: true,
