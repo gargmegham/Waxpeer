@@ -1,12 +1,38 @@
 import prisma from "../lib/prisma";
 import Layout from "../components/Layout";
 import { GetServerSideProps } from "next";
-import { Card, Input, Button, InputNumber, Form, Col, Row, Switch } from "antd";
+import {
+  Card,
+  Input,
+  Button,
+  message,
+  InputNumber,
+  Form,
+  Col,
+  Row,
+  Switch,
+} from "antd";
 import React from "react";
 import EditOutlined from "@ant-design/icons/EditOutlined";
 
 const Settings: React.FC<any> = ({ settings }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
+
+  const saveSettings = async (values: any) => {
+    setEditMode(false);
+    await fetch("/api/settings", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ values }),
+    });
+    message.success("Settings updated!");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
 
   return (
     <Layout>
@@ -26,24 +52,14 @@ const Settings: React.FC<any> = ({ settings }) => {
                 Edit
               </Button>
             ) : (
-              <>
-                <Button
-                  style={{ marginRight: "16px" }}
-                  onClick={() => {
-                    setEditMode(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    setEditMode(false);
-                  }}
-                >
-                  Save
-                </Button>
-              </>
+              <Button
+                style={{ marginRight: "16px" }}
+                onClick={() => {
+                  setEditMode(false);
+                }}
+              >
+                Cancel
+              </Button>
             )}
           </>
         }
@@ -52,11 +68,17 @@ const Settings: React.FC<any> = ({ settings }) => {
           title="Update Settings"
           layout="vertical"
           key={`${editMode}-settings`}
+          initialValues={settings}
+          disabled={!editMode}
+          onFinish={saveSettings}
         >
           <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
             <Col span={4}>Waxpeer API Key</Col>
             <Col span={12}>
-              <Form.Item name="waxpeerApiKey">
+              <Form.Item
+                name="waxpeerApiKey"
+                rules={[{ required: true, message: "Required field!" }]}
+              >
                 <Input
                   disabled={!editMode}
                   defaultValue={settings.waxpeerApiKey}
@@ -67,7 +89,10 @@ const Settings: React.FC<any> = ({ settings }) => {
           <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
             <Col span={4}>Priceempire API Key</Col>
             <Col span={12}>
-              <Form.Item name="priceEmpireApiKey">
+              <Form.Item
+                name="priceEmpireApiKey"
+                rules={[{ required: true, message: "Required field!" }]}
+              >
                 <Input
                   disabled={!editMode}
                   defaultValue={settings.priceEmpireApiKey}
@@ -78,12 +103,12 @@ const Settings: React.FC<any> = ({ settings }) => {
           <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
             <Col span={4}>Status</Col>
             <Col span={8}>
-              <Form.Item name="paused">
+              <Form.Item name="paused" valuePropName="paused">
                 <Switch
-                  defaultChecked={!settings.paused}
+                  defaultChecked={settings.paused}
                   disabled={!editMode}
-                  checkedChildren={"Running"}
-                  unCheckedChildren={"Paused"}
+                  checkedChildren={"Paused"}
+                  unCheckedChildren={"Running"}
                 />
               </Form.Item>
             </Col>
@@ -91,7 +116,10 @@ const Settings: React.FC<any> = ({ settings }) => {
           <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
             <Col span={4}>Bot Frequency In Minutes</Col>
             <Col span={8}>
-              <Form.Item name="botInterval">
+              <Form.Item
+                name="botInterval"
+                rules={[{ required: true, message: "Required field!" }]}
+              >
                 <InputNumber
                   disabled={!editMode}
                   defaultValue={settings.botInterval}
@@ -99,6 +127,17 @@ const Settings: React.FC<any> = ({ settings }) => {
               </Form.Item>
             </Col>
           </Row>
+          {editMode ? (
+            <Row>
+              <Col span={4}>
+                <Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    Save
+                  </Button>
+                </Form.Item>
+              </Col>
+            </Row>
+          ) : null}
         </Form>
       </Card>
     </Layout>
