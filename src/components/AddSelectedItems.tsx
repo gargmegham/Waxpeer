@@ -37,6 +37,8 @@ type Props = {
   selectedItem: SelectedItem;
 };
 
+// call api only once
+
 const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
   const [sourcePrices, setSourcePrices] = React.useState<any>({});
   const [fetching, setFetching] = React.useState<boolean>(true);
@@ -66,7 +68,7 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
     } catch (e) {
       console.log(e);
     }
-  });
+  }, [selectedItem]);
 
   return fetching ? (
     <Spin size="large" />
