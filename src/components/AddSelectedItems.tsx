@@ -52,7 +52,7 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ name: encodeURIComponent(selectedItem.name) }),
+          body: JSON.stringify({ name: selectedItem.name }),
         });
         const data = await res.json();
         if (data.status === false) message.error(data.message);

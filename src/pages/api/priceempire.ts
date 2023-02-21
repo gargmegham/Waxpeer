@@ -24,11 +24,11 @@ export default async function handle(
       if (!decoded) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const sourceString: string = sources
+      const sourceString = sources
         .map((source: Source) => source.value)
         .join(",");
       const apiKey: string = "ab661d74-39c2-4d6b-9529-33c571a9ee45";
-      const name: string = JSON.parse(req.body).name;
+      const name: string = encodeURIComponent(req.body.name);
       let myHeaders = new Headers();
       myHeaders.append("accept", "application/json");
       const result = await fetch(
