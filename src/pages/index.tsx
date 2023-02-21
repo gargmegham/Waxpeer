@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, InputNumber, Switch, Card, Button } from "antd";
+import { Table, Modal, message, InputNumber, Switch, Card, Button } from "antd";
 import Layout from "../components/Layout";
 import prisma from "../lib/prisma";
 import EditOutlined from "@ant-design/icons/EditOutlined";
@@ -10,7 +10,28 @@ import EditItemModal from "../components/EditItemModal";
 const Listings: React.FC<any> = ({ items }) => {
   const [editItemModalVisible, setEditItemModalVisible] =
     React.useState<boolean>(false);
+  const [deleteConfirmModalVisible, setDeleteConfirmModalVisible] =
+    React.useState<boolean>(false);
+  const [deleteConfirmModalItem, setDeleteConfirmModalItem] =
+    React.useState<any>(null);
   const [editItemModalItem, setEditItemModalItem] = React.useState<any>(null);
+
+  const deleteItem = async () => {
+    await fetch("/api/items", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ id: deleteConfirmModalItem.id }),
+    });
+    message.success("Item deleted");
+    setDeleteConfirmModalVisible(false);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
+
   return (
     <Layout>
       <Card title="Currently Live Bot Trades">
@@ -45,7 +66,14 @@ const Listings: React.FC<any> = ({ items }) => {
                         setEditItemModalVisible(true);
                       }}
                     ></Button>
-                    <Button danger icon={<DeleteOutlined />}></Button>
+                    <Button
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() => {
+                        setDeleteConfirmModalItem(record);
+                        setDeleteConfirmModalVisible(true);
+                      }}
+                    ></Button>
                   </>
                 );
               },
@@ -229,6 +257,24 @@ const Listings: React.FC<any> = ({ items }) => {
           setShowModal={setEditItemModalVisible}
           selectedItem={editItemModalItem}
         />
+      ) : null}
+      {deleteConfirmModalVisible ? (
+        <Modal
+          title="Delete Item"
+          okButtonProps={{
+            style: {
+              backgroundColor: "#ff4d4f",
+              borderColor: "#ff4d4f",
+            },
+          }}
+          okText="Delete"
+          cancelText="No"
+          open={deleteConfirmModalVisible}
+          onOk={deleteItem}
+          onCancel={() => setDeleteConfirmModalVisible(false)}
+        >
+          <p>Are you sure you want to delete this item?</p>
+        </Modal>
       ) : null}
     </Layout>
   );

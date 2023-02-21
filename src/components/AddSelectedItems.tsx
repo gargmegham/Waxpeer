@@ -49,7 +49,11 @@ const AddSelectedItems: React.FC<AddSelectedItemsProps> = ({
       },
       body: JSON.stringify({ items }),
     });
+    message.success("Items added successfully!");
     setShowSelectedItems(false);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   const actions = (

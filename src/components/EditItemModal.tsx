@@ -12,7 +12,6 @@ import {
   Form,
   Card,
 } from "antd";
-import mockedResponse from "../mockedResponse";
 import { SelectedItem, EditItemModalProps } from "../types";
 
 const EditItemModal: React.FC<EditItemModalProps> = ({
@@ -23,7 +22,21 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   const [inputs, setInputs] = React.useState<SelectedItem>(selectedItem);
   const [fetching, setFetching] = React.useState<boolean>(true);
 
-  const submit = async () => {};
+  const submit = async () => {
+    await fetch("/api/items", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ inputs }),
+    });
+    message.success("Item edited successfully!");
+    setShowModal(false);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
 
   React.useEffect(() => {
     try {
