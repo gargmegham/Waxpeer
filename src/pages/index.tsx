@@ -15,70 +15,64 @@ const Listings: React.FC<any> = ({ items }) => {
             pageSizeOptions: ["50", "100"],
           }}
           dataSource={items}
+          scroll={{ x: 1400 }}
           columns={[
             {
               title: "Name",
               dataIndex: "name",
-              width: 200,
               fixed: "left",
-            },
-            {
-              title: "Source Price",
-              width: 200,
-              dataIndex: "sourcePrice",
-            },
-            {
-              title: "Current Price",
-              width: 200,
-              dataIndex: "currentPrice",
+              width: 250,
             },
             {
               title: "Source",
-              fixed: "left",
               dataIndex: "source",
-              // render: (source: string, record: any, index: number) => {
-              //   return (
-              // options will be the keys of the prices object where sourcePrice is not null
-              // <Select
-              //   defaultValue={source}
-              //   style={{ width: 230 }}
-              //   options={Object.keys(record.prices)
-              //     .filter((key) => record.prices[key].sourcePrice !== null)
-              //     .map((key) => {
-              //       return {
-              //         value: key,
-              //         label: `${`$ ${
-              //           record.prices[key].sourcePrice / 100
-              //         }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} (${key})`,
-              //       };
-              //     })}
-              //   disabled={true}
-              // onChange={(e) => {
-              //   setItems(
-              //     items.map((item: any, i: number) => {
-              //       if (i === index) {
-              //         return {
-              //           ...item,
-              //           source: e,
-              //           sourcePrice: record.prices[e].sourcePrice / 100,
-              //         };
-              //       }
-              //       return item;
-              //     })
-              //   );
-              // }}
-              // >
-              //   Source
-              // </Select>
-              //   );
-              // },
-              width: 260,
+              width: 100,
+            },
+            {
+              title: "Source Price",
+              dataIndex: "sourcePrice",
+              render: (sourcePrice: number) => {
+                return (
+                  <InputNumber
+                    min={0}
+                    size="large"
+                    disabled={true}
+                    defaultValue={sourcePrice}
+                    formatter={(value) =>
+                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    }
+                    // @ts-ignore
+                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                  />
+                );
+              },
+              width: 150,
+            },
+            {
+              title: "Current Price",
+              dataIndex: "currentPrice",
+              render: (sourcePrice: number) => {
+                return (
+                  <InputNumber
+                    min={0}
+                    size="large"
+                    disabled={true}
+                    defaultValue={sourcePrice}
+                    formatter={(value) =>
+                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    }
+                    // @ts-ignore
+                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                  />
+                );
+              },
+              width: 150,
             },
             {
               title: "Undercut Price",
               dataIndex: "undercutPrice",
               width: 120,
-              render: (undercutPrice: number, record: any) => {
+              render: (undercutPrice: number) => {
                 return (
                   <InputNumber
                     min={0}
@@ -90,9 +84,6 @@ const Listings: React.FC<any> = ({ items }) => {
                     }
                     // @ts-ignore
                     parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
-                    // onChange={(e) => {
-                    //   record.undercutPrice = Number(e);
-                    // }}
                   />
                 );
               },
@@ -101,7 +92,7 @@ const Listings: React.FC<any> = ({ items }) => {
               title: "Undercut Percentage",
               dataIndex: "undercutPercentage",
               width: 120,
-              render: (undercutPercentage: number, record: any) => {
+              render: (undercutPercentage: number) => {
                 return (
                   <InputNumber
                     min={0}
@@ -112,9 +103,6 @@ const Listings: React.FC<any> = ({ items }) => {
                     formatter={(value) => `${value}%`}
                     // @ts-ignore
                     parser={(value) => value!.replace("%", "")}
-                    // onChange={(e) => {
-                    //   record.undercutPercentage = Number(e);
-                    // }}
                   />
                 );
               },
@@ -127,11 +115,6 @@ const Listings: React.FC<any> = ({ items }) => {
                 return (
                   <Switch
                     defaultChecked={undercutByPriceOrPercentage === "price"}
-                    // onChange={(checked) => {
-                    //   record.undercutByPriceOrPercentage = checked
-                    //     ? "price"
-                    //     : "percentage";
-                    // }}
                     unCheckedChildren="Percentage"
                     disabled={true}
                     checkedChildren="Price"
@@ -155,9 +138,6 @@ const Listings: React.FC<any> = ({ items }) => {
                     }
                     // @ts-ignore
                     parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
-                    // onChange={(e) => {
-                    //   record.priceRangeMin = Number(e);
-                    // }}
                   />
                 );
               },
@@ -178,9 +158,6 @@ const Listings: React.FC<any> = ({ items }) => {
                     }
                     // @ts-ignore
                     parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
-                    // onChange={(e) => {
-                    //   record.priceRangeMax = Number(e);
-                    // }}
                   />
                 );
               },
@@ -213,11 +190,6 @@ const Listings: React.FC<any> = ({ items }) => {
                   <Switch
                     defaultChecked={whenNoOneToUndercutListUsing === "max"}
                     disabled={true}
-                    // onChange={(checked) => {
-                    //   record.whenNoOneToUndercutListUsing = checked
-                    //     ? "max"
-                    //     : "percentage";
-                    // }}
                     unCheckedChildren="Price Percentage"
                     checkedChildren="Range Max"
                   />
