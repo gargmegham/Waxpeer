@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { sourceString, signingKey } from "../../constants";
+import { Item } from "../inventory";
 
 // POST /api/priceempire
 export default async function handle(
@@ -20,14 +21,14 @@ export default async function handle(
       }
       // fetch data from priceempire
       const apiKey: string = "ab661d74-39c2-4d6b-9529-33c571a9ee45";
-      const selectedItems = req.body.selectedItems;
+      const selectedItems: Array<Item> = req.body.selectedItems;
       const response: any = {
         status: true,
         items: {},
         message: "",
       };
       for (const item of selectedItems) {
-        const name: string = encodeURIComponent(item);
+        const name: string = encodeURIComponent(item.name);
         let myHeaders = new Headers();
         myHeaders.append("accept", "application/json");
         const result = await fetch(
