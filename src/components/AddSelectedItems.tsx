@@ -64,11 +64,14 @@ const AddSelectedItems: React.FC<Props> = ({ setShowModal, selectedItem }) => {
             data.item.prices[selectedItem.source].sourcePrice;
         }
       };
-      fetchSourcePrices();
+      // call api only once
+      if (Object.keys(sourcePrices).length === 0) {
+        fetchSourcePrices();
+      }
     } catch (e) {
       console.log(e);
     }
-  }, [selectedItem]);
+  });
 
   return fetching ? (
     <Spin size="large" />
