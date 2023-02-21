@@ -5,31 +5,9 @@ import { Table, Spin, Card, Button, Input } from "antd";
 import prisma from "../lib/prisma";
 import AddSelectedItems from "../components/AddSelectedItems";
 import { message } from "antd";
+import { Item, Inventory, ActiveItem, MyInventoryProps } from "../types";
 
-type Item = {
-  item_id: number;
-  icon_url: string;
-  name: string;
-  type: string;
-  active: string;
-  steam_price: object;
-};
-
-type Inventory = {
-  count: number;
-  success: boolean;
-  items: Array<Item>;
-};
-
-type ActiveItem = {
-  item_id: number;
-};
-
-type Props = {
-  activeItems: Array<ActiveItem>;
-};
-
-const MyInventory: React.FC<Props> = ({ activeItems }) => {
+const MyInventory: React.FC<MyInventoryProps> = ({ activeItems }) => {
   const [selectedItems, setSelectedItems] = React.useState<Array<Item>>([]);
   const [search, setSearch] = React.useState<string>("");
   const [showSelectedItems, setShowSelectedItems] =
@@ -188,4 +166,3 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 export default MyInventory;
-export type { Item };

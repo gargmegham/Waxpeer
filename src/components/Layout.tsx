@@ -3,11 +3,7 @@ import { useRouter } from "next/router";
 import Header from "./Header";
 import styles from "@/components/Layout.module.css";
 
-type Props = {
-  children: ReactNode;
-};
-
-const Layout: React.FC<Props> = (props) => {
+const Layout: React.FC<any> = (props) => {
   const router = useRouter();
 
   // onmount check if token is present

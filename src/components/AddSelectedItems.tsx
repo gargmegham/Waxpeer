@@ -9,42 +9,10 @@ import {
   Select,
   message,
 } from "antd";
-import mockedResponse from "../mockedResponse";
-import { Item } from "../pages/inventory";
+import { Item } from "../types";
+import { AddSelectedItemsProps, SelectedItem } from "../types";
 
-type SourcePrice = {
-  sourcePrice: number;
-};
-
-type SourcePrices = {
-  [key: string]: SourcePrice;
-};
-
-export type SelectedItem = {
-  item_id: number;
-  icon_url: string;
-  name: string;
-  type: string;
-  steam_price: object;
-  source: string;
-  sourcePrice: number;
-  prices: SourcePrices;
-  lastUpdated: Date;
-  undercutPrice: number;
-  undercutPercentage: number;
-  undercutByPriceOrPercentage: string;
-  priceRangeMin: number;
-  priceRangeMax: number;
-  priceRangePercentage: number;
-  whenNoOneToUndercutListUsing: string;
-};
-
-type Props = {
-  setShowSelectedItems: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedItems: Array<Item>;
-};
-
-const AddSelectedItems: React.FC<Props> = ({
+const AddSelectedItems: React.FC<AddSelectedItemsProps> = ({
   setShowSelectedItems,
   selectedItems,
 }) => {
@@ -81,7 +49,11 @@ const AddSelectedItems: React.FC<Props> = ({
       },
       body: JSON.stringify({ items }),
     });
+    message.success("Items added successfully!");
     setShowSelectedItems(false);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   const actions = (
@@ -119,7 +91,6 @@ const AddSelectedItems: React.FC<Props> = ({
           // if error
           message.error(data.message);
           setShowSelectedItems(false);
-          return;
         }
         setItems(
           // if success
