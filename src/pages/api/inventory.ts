@@ -26,7 +26,6 @@ export default async function handle(
         },
       });
       const apiKey: string = settings?.waxpeerApiKey || "";
-      console.log(settings);
       let myHeaders = new Headers();
       myHeaders.append("accept", "application/json");
       let requestOptions = {
