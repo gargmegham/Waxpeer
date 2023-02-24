@@ -98,11 +98,6 @@ const Listings: React.FC<any> = ({ items }) => {
               },
             },
             {
-              title: "Source",
-              dataIndex: "source",
-              width: 100,
-            },
-            {
               title: "Source Price",
               dataIndex: "sourcePrice",
               sortDirections: ["descend", "ascend"],
@@ -145,77 +140,6 @@ const Listings: React.FC<any> = ({ items }) => {
                 );
               },
               width: 150,
-            },
-            {
-              title: "Undercut Price",
-              dataIndex: "undercutPrice",
-              sortDirections: ["descend", "ascend"],
-              sorter: (a: any, b: any) => a.item_id - b.item_id,
-              width: 120,
-              render: (undercutPrice: number) => {
-                return (
-                  <InputNumber
-                    min={0}
-                    size="large"
-                    disabled={true}
-                    defaultValue={undercutPrice}
-                    formatter={(value) =>
-                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
-                    // @ts-ignore
-                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
-                  />
-                );
-              },
-            },
-            {
-              title: "Undercut Percentage",
-              sortDirections: ["descend", "ascend"],
-              sorter: (a: any, b: any) => a.item_id - b.item_id,
-              dataIndex: "undercutPercentage",
-              width: 120,
-              render: (undercutPercentage: number) => {
-                return (
-                  <InputNumber
-                    min={0}
-                    max={100}
-                    size="large"
-                    defaultValue={undercutPercentage}
-                    disabled={true}
-                    formatter={(value) => `${value}%`}
-                    // @ts-ignore
-                    parser={(value) => value!.replace("%", "")}
-                  />
-                );
-              },
-            },
-            {
-              title: "Undercut By",
-              dataIndex: "undercutByPriceOrPercentage",
-              width: 130,
-              render: (undercutByPriceOrPercentage: string, record: any) => {
-                return (
-                  <Switch
-                    defaultChecked={undercutByPriceOrPercentage === "price"}
-                    unCheckedChildren="Percentage"
-                    disabled={true}
-                    checkedChildren="Price"
-                  />
-                );
-              },
-              filters: [
-                {
-                  text: "Price",
-                  value: "price",
-                },
-                {
-                  text: "Percentage",
-                  value: "percentage",
-                },
-              ],
-              // @ts-ignore
-              onFilter: (value: string, record: Item) =>
-                record.undercutByPriceOrPercentage.indexOf(value) === 0,
             },
             {
               title: "Range Min",
@@ -275,34 +199,6 @@ const Listings: React.FC<any> = ({ items }) => {
                     formatter={(value) => `${value}%`}
                     // @ts-ignore
                     parser={(value) => value!.replace("%", "")}
-                  />
-                );
-              },
-            },
-            {
-              title: "List Using (When No One To Undercut)",
-              dataIndex: "whenNoOneToUndercutListUsing",
-              filters: [
-                {
-                  text: "Range Max",
-                  value: "max",
-                },
-                {
-                  text: "Price Percentage",
-                  value: "percentage",
-                },
-              ],
-              // @ts-ignore
-              onFilter: (value: string, record: Item) =>
-                record.whenNoOneToUndercutListUsing.indexOf(value) === 0,
-              width: 180,
-              render: (whenNoOneToUndercutListUsing: string, record: any) => {
-                return (
-                  <Switch
-                    defaultChecked={whenNoOneToUndercutListUsing === "max"}
-                    disabled={true}
-                    unCheckedChildren="Price Percentage"
-                    checkedChildren="Range Max"
                   />
                 );
               },
