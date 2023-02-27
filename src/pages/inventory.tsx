@@ -89,9 +89,9 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems }) => {
           />
           <Table
             pagination={{
-              pageSize: 50,
+              pageSize: 10,
               showSizeChanger: true,
-              pageSizeOptions: ["50", "100"],
+              pageSizeOptions: ["10", "20", "50", "100"],
             }}
             rowSelection={{
               type: "checkbox",
