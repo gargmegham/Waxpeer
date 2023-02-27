@@ -17,7 +17,9 @@ export async function waxPeerBot() {
 
     const itemsWithinPriceRange = searchedItems.filter(
       (item: WaxPeerSearchItemResult) =>
-        minRange >= item.price && item.price <= maxRange
+        minRange >= item.price &&
+        item.price <= maxRange &&
+        item.item_id !== itemToBeTraded.item_id
     );
 
     console.log(minRange, maxRange, itemsWithinPriceRange, searchedItems);
