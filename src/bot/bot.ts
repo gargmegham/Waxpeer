@@ -34,15 +34,17 @@ export async function waxPeerBot() {
         itemsWithinPriceRange.map((item: WaxPeerSearchItemResult) => item.price)
       );
       if (itemToBeTraded.undercutByPriceOrPercentage === "percentage") {
-        newPrice = minPriceFromRange * itemToBeTraded.undercutPercentage;
+        newPrice =
+          minPriceFromRange * (itemToBeTraded.undercutPercentage / 100);
       } else {
-        newPrice = minPriceFromRange * itemToBeTraded.undercutPrice;
+        newPrice = minPriceFromRange - itemToBeTraded.undercutPrice;
       }
     } //if there are no items in price range
     else {
       if (itemToBeTraded.whenNoOneToUndercutListUsing === "percentage") {
         newPrice =
-          itemToBeTraded.sourcePrice * itemToBeTraded.undercutPercentage;
+          itemToBeTraded.sourcePrice *
+          (itemToBeTraded.priceRangePercentage / 100);
       } else {
         newPrice = maxRange;
       }
