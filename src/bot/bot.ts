@@ -1,7 +1,7 @@
 import { SourcePrice } from "./../types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../lib/prisma";
-import { WaxPeerSearchItemResult, ListItem } from "../types";
+import { WaxPeerSearchItemResult, ListItem, UpdatedItemsType } from "../types";
 
 export async function waxPeerBot() {
   const itemsNeedTobeTraded = await prisma.item.findMany();
@@ -21,10 +21,6 @@ export async function waxPeerBot() {
     );
 
     console.log(minRange, maxRange, itemsWithinPriceRange, searchedItems);
-
-    interface UpdatedItemsType extends WaxPeerSearchItemResult {
-      newPrice: number;
-    }
 
     let newPrice: number = 0;
 

@@ -66,6 +66,10 @@ export type WaxPeerSearchItemResult = {
   item_id: string;
 };
 
+export interface UpdatedItemsType extends WaxPeerSearchItemResult {
+  newPrice: number;
+}
+
 export type ListItem = {
   item_id: string;
   price: number;
