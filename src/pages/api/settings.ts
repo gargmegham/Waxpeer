@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../lib/prisma";
 import { signingKey } from "../../constants";
+import { cronSchedule } from "../../bot/chron";
 
 // GET /api/inventory
 export default async function handle(
@@ -32,6 +33,7 @@ export default async function handle(
           paused: Boolean(values.paused),
         },
       });
+      cronSchedule(Number(values.botInterval));
       return res.status(200).json(updatedSettings);
     }
   } catch (e: any) {
