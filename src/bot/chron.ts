@@ -1,11 +1,14 @@
 import cron from "node-cron";
+import { waxPeerBot } from "./bot";
 
 function action() {
-  console.log("This cron job will run every second");
+  console.log("The bot is running");
+  waxPeerBot();
 }
 
 export function cronSchedule(timeInMinutes: number) {
-  const cronExpression = createChronExpression(timeInMinutes);
+  // const cronExpression = createChronExpression(timeInMinutes);
+  const cronExpression = "* * * * *";
   console.log(cronExpression, cron.validate(cronExpression));
 
   const job = cron.schedule(cronExpression, action);

@@ -58,3 +58,15 @@ export type EditItemModalProps = {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   selectedItem: SelectedItem;
 };
+
+export type WaxPeerSearchItemResult = {
+  name: string;
+  price: number;
+  image: string;
+  item_id: string;
+};
+
+export type ListItem = {
+  item_id: string;
+  price: number;
+};
