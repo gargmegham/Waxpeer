@@ -5,9 +5,13 @@ import { WaxPeerSearchItemResult, ListItem, UpdatedItemsType } from "../types";
 
 export async function waxPeerBot() {
   const itemsNeedTobeTraded = await prisma.item.findMany();
+  let updateItemPrice: Array<UpdatedItemsType> = [];
+  let listItems: Array<UpdatedItemsType> = [];
 
   //loop over all items
   itemsNeedTobeTraded.map(async (itemToBeTraded) => {
+    //source price need be divided by 100
+    // fetch new source price and update the database
     const minRange: number =
       (itemToBeTraded.priceRangeMin / 100) * itemToBeTraded.sourcePrice;
     const maxRange: number =
@@ -17,8 +21,8 @@ export async function waxPeerBot() {
 
     const itemsWithinPriceRange = searchedItems.filter(
       (item: WaxPeerSearchItemResult) =>
-        minRange >= item.price &&
-        item.price <= maxRange &&
+        minRange >= item.price / 1000 &&
+        item.price / 1000 <= maxRange &&
         item.item_id !== itemToBeTraded.item_id
     );
 
@@ -55,11 +59,13 @@ export async function waxPeerBot() {
     console.log(currentItem, "currentItem");
 
     if (currentItem) {
-      updateItemPrice(currentItem);
+      updateItemPrice.push(currentItem);
     } else {
-      listItems(currentItem);
+      listItems.push(currentItem);
     }
   });
+  updateItemPricesOnWaxPeer(updateItemPrice);
+  listItemsOnWaxPeer(listItems);
 }
 
 async function searchItemsInWaxPeer(itemName: string) {
@@ -83,10 +89,10 @@ async function searchItemsInWaxPeer(itemName: string) {
   return items;
 }
 
-async function listItems(item: ListItem) {
+async function listItemsOnWaxPeer(item: Array<UpdatedItemsType>) {
   console.log("listed item");
 }
 
-async function updateItemPrice(item: ListItem) {
+async function updateItemPricesOnWaxPeer(item: Array<UpdatedItemsType>) {
   console.log("updated item price");
 }
