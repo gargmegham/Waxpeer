@@ -1,12 +1,6 @@
-import { SourcePrice } from "./../types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../lib/prisma";
-import {
-  WaxPeerSearchItemResult,
-  ListItem,
-  UpdatedItemsType,
-  ItemInDb,
-} from "../types";
+import { WaxPeerSearchItemResult, UpdatedItemsType, ItemInDb } from "../types";
 import mockedResponse from "../mockedResponse";
 
 export async function waxPeerBot() {
@@ -16,7 +10,7 @@ export async function waxPeerBot() {
 
   const { items } = mockedResponse;
 
-  //   const { items } = await getAllItemPrices(
+  //   const  items  = await getAllItemPrices(
   //     itemsNeedTobeTraded[0].source || "buff"
   //   );
   //replace this with the commented line above on server
@@ -28,7 +22,10 @@ export async function waxPeerBot() {
     // fetch new source price and update the database
 
     const sourcePrice: number =
-      latestSourcePrices[itemToBeTraded.name || ""]?.sourcePrice || 0;
+      latestSourcePrices[itemToBeTraded.name]?.item.prices[
+        itemToBeTraded.source
+      ].sourcePrice || 0;
+
     const minRange: number =
       (itemToBeTraded.priceRangeMin / 100) * (sourcePrice / 100);
     const maxRange: number =
@@ -43,15 +40,18 @@ export async function waxPeerBot() {
         item.item_id !== itemToBeTraded.item_id
     );
 
-    console.log(minRange, maxRange, itemsWithinPriceRange, searchedItems);
+    console.log(minRange, maxRange, itemsWithinPriceRange);
 
     let newPrice: number = 0;
 
     //if items within price range
     if (itemsWithinPriceRange.length) {
       const minPriceFromRange = Math.min(
-        itemsWithinPriceRange.map((item: WaxPeerSearchItemResult) => item.price)
+        itemsWithinPriceRange.map(
+          (item: WaxPeerSearchItemResult) => item.price / 1000
+        )
       );
+      console.log(minPriceFromRange, "minPriceFromRange");
       if (itemToBeTraded.undercutByPriceOrPercentage === "percentage") {
         newPrice =
           minPriceFromRange * (itemToBeTraded.undercutPercentage / 100);
@@ -61,7 +61,8 @@ export async function waxPeerBot() {
     } //if there are no items in price range
     else {
       if (itemToBeTraded.whenNoOneToUndercutListUsing === "percentage") {
-        newPrice = sourcePrice * (itemToBeTraded.priceRangePercentage / 100);
+        newPrice =
+          (sourcePrice / 100) * (itemToBeTraded.priceRangePercentage / 100);
       } else {
         newPrice = maxRange;
       }
@@ -71,12 +72,12 @@ export async function waxPeerBot() {
     const currentItem = searchedItems.findIndex(
       (item: WaxPeerSearchItemResult) => item.item_id === itemToBeTraded.item_id
     );
-    console.log(currentItem, "currentItem");
+    // console.log(currentItem, "currentItem");
 
     if (currentItem) {
-      updateItemPrice.push(currentItem);
+      updateItemPrice.push({ ...currentItem, newPrice });
     } else {
-      listItems.push(currentItem);
+      listItems.push({ ...currentItem, newPrice });
     }
   });
   updateItemPricesOnWaxPeer(updateItemPrice);

@@ -19,9 +19,12 @@ model Settings {
   id Int @id @default(autoincrement())
   userId Int
   waxpeerApiKey String?
+  waxpeerRateLimit Int?
   priceEmpireApiKey String?
-  botInterval Int?
+  PriceEmpireRateLimit Int?
   paused Boolean @default(false)
+  priceRangeMin Float
+  priceRangeMax Float
 }
 
 model Item {
