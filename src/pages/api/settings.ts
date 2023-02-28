@@ -29,11 +29,18 @@ export default async function handle(
         data: {
           waxpeerApiKey: String(values.waxpeerApiKey),
           priceEmpireApiKey: String(values.priceEmpireApiKey),
-          botInterval: Number(values.botInterval),
+          waxpeerRateLimit: values.waxpeerRateLimit,
+          PriceEmpireRateLimit: values.PriceEmpireRateLimit,
           paused: Boolean(values.paused),
         },
       });
-      cronSchedule(Number(values.botInterval));
+      // values.priceRange
+      // const updatedPriceRange = await prisma.priceRange.upsert({
+      //   where: {
+      //     settingsId: updatedSettings.id,
+      //   },
+      // });
+      // cronSchedule(Number(values.botInterval));
       return res.status(200).json(updatedSettings);
     }
   } catch (e: any) {

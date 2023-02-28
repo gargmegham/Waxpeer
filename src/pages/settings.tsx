@@ -11,9 +11,11 @@ import {
   Col,
   Row,
   Switch,
+  Space,
 } from "antd";
 import React from "react";
 import EditOutlined from "@ant-design/icons/EditOutlined";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
 const Settings: React.FC<any> = ({ settings }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
@@ -114,18 +116,90 @@ const Settings: React.FC<any> = ({ settings }) => {
             </Col>
           </Row>
           <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
-            <Col span={4}>Bot Frequency In Minutes</Col>
+            <Col span={4}>WaxPeer API limit</Col>
             <Col span={8}>
               <Form.Item
-                name="botInterval"
+                name="waxpeerRateLimit"
                 rules={[{ required: true, message: "Required field!" }]}
               >
                 <InputNumber
                   disabled={!editMode}
-                  defaultValue={settings.botInterval}
+                  defaultValue={settings.waxpeerRateLimit}
                 />
               </Form.Item>
             </Col>
+          </Row>
+          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
+            <Col span={4}>Price Empire API limit</Col>
+            <Col span={8}>
+              <Form.Item
+                name="PriceEmpireRateLimit"
+                rules={[{ required: true, message: "Required field!" }]}
+              >
+                <InputNumber
+                  disabled={!editMode}
+                  defaultValue={settings.PriceEmpireRateLimit}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Form.List name="sights">
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map((field) => (
+                    <Space key={field.key} align="baseline">
+                      <Form.Item
+                        {...field}
+                        label="Price"
+                        name={[field.name, "price"]}
+                        rules={[{ required: true, message: "Missing price" }]}
+                      >
+                        <Input />
+                      </Form.Item>
+                      <Form.Item
+                        {...field}
+                        label="Price"
+                        name={[field.name, "price"]}
+                        rules={[{ required: true, message: "Missing price" }]}
+                      >
+                        <Input />
+                      </Form.Item>
+                      <Form.Item
+                        {...field}
+                        label="Price"
+                        name={[field.name, "price"]}
+                        rules={[{ required: true, message: "Missing price" }]}
+                      >
+                        <Input />
+                      </Form.Item>
+                      <Form.Item
+                        {...field}
+                        label="Price"
+                        name={[field.name, "price"]}
+                        rules={[{ required: true, message: "Missing price" }]}
+                      >
+                        <Input />
+                      </Form.Item>
+
+                      <MinusCircleOutlined onClick={() => remove(field.name)} />
+                    </Space>
+                  ))}
+                  <Row>
+                    <Form.Item>
+                      <Button
+                        type="dashed"
+                        onClick={() => add()}
+                        block
+                        icon={<PlusOutlined />}
+                      >
+                        Add sights
+                      </Button>
+                    </Form.Item>
+                  </Row>
+                </>
+              )}
+            </Form.List>
           </Row>
           {editMode ? (
             <Row>
@@ -149,7 +223,11 @@ export const getServerSideProps: GetServerSideProps = async () => {
     where: {
       id: 1,
     },
+    include: {
+      priceRange: true,
+    },
   });
+  console.log(settings);
   return {
     props: {
       settings,

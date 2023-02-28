@@ -23,6 +23,15 @@ model Settings {
   priceEmpireApiKey String?
   PriceEmpireRateLimit Int?
   paused Boolean @default(false)
+  priceRange PriceRange[]
+}
+
+model PriceRange{
+  id Int @id @default(autoincrement())
+  settings           Settings             @relation(fields: [settingsId], references: [id])
+  settingsId         Int
+  SourcePriceMin Float?
+  SourcePriceMax Float?
   priceRangeMin Float
   priceRangeMax Float
 }

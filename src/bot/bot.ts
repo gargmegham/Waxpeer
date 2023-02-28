@@ -8,11 +8,9 @@ export async function waxPeerBot() {
   let updateItemPrice: Array<UpdatedItemsType> = [];
   let listItems: Array<UpdatedItemsType> = [];
 
-  const { items } = mockedResponse;
+  //   const { items } = mockedResponse;
 
-  //   const  items  = await getAllItemPrices(
-  //     itemsNeedTobeTraded[0].source || "buff"
-  //   );
+  const items = await getAllItemPrices(itemsNeedTobeTraded[0].source || "buff");
   //replace this with the commented line above on server
   const latestSourcePrices = items;
 
@@ -121,6 +119,17 @@ async function listItemsOnWaxPeer(item: Array<UpdatedItemsType>) {
 }
 
 async function updateItemPricesOnWaxPeer(item: Array<UpdatedItemsType>) {
+  //POST
+  // https://api.waxpeer.com/v1/edit-items?api=4d0de41b32c608b308b6e74956a0b57675ce6e83d6788e02cb64db8cc440f2f0&game=csgo
+  //SAMPLE PAYLOAD
+  //   {
+  //     "items": [
+  //       {
+  //         "item_id": 27440807699,
+  //         "price": 2400000
+  //       }
+  //     ]
+  //   }
   console.log("updated item price");
 }
 
