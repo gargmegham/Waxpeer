@@ -1,21 +1,38 @@
 import { SourcePrice } from "./../types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../lib/prisma";
-import { WaxPeerSearchItemResult, ListItem, UpdatedItemsType } from "../types";
+import {
+  WaxPeerSearchItemResult,
+  ListItem,
+  UpdatedItemsType,
+  ItemInDb,
+} from "../types";
+import mockedResponse from "../mockedResponse";
 
 export async function waxPeerBot() {
-  const itemsNeedTobeTraded = await prisma.item.findMany();
+  const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
   let updateItemPrice: Array<UpdatedItemsType> = [];
   let listItems: Array<UpdatedItemsType> = [];
 
+  const { items } = mockedResponse;
+
+  //   const { items } = await getAllItemPrices(
+  //     itemsNeedTobeTraded[0].source || "buff"
+  //   );
+  //replace this with the commented line above on server
+  const latestSourcePrices = items;
+
   //loop over all items
-  itemsNeedTobeTraded.map(async (itemToBeTraded) => {
+  itemsNeedTobeTraded.map(async (itemToBeTraded: ItemInDb) => {
     //source price need be divided by 100
     // fetch new source price and update the database
+
+    const sourcePrice: number =
+      latestSourcePrices[itemToBeTraded.name || ""]?.sourcePrice || 0;
     const minRange: number =
-      (itemToBeTraded.priceRangeMin / 100) * itemToBeTraded.sourcePrice;
+      (itemToBeTraded.priceRangeMin / 100) * (sourcePrice / 100);
     const maxRange: number =
-      (itemToBeTraded.priceRangeMax / 100) * itemToBeTraded.sourcePrice;
+      (itemToBeTraded.priceRangeMax / 100) * (sourcePrice / 100);
 
     const searchedItems = await searchItemsInWaxPeer(itemToBeTraded.name);
 
@@ -44,9 +61,7 @@ export async function waxPeerBot() {
     } //if there are no items in price range
     else {
       if (itemToBeTraded.whenNoOneToUndercutListUsing === "percentage") {
-        newPrice =
-          itemToBeTraded.sourcePrice *
-          (itemToBeTraded.priceRangePercentage / 100);
+        newPrice = sourcePrice * (itemToBeTraded.priceRangePercentage / 100);
       } else {
         newPrice = maxRange;
       }
@@ -90,9 +105,41 @@ async function searchItemsInWaxPeer(itemName: string) {
 }
 
 async function listItemsOnWaxPeer(item: Array<UpdatedItemsType>) {
+  //POST
+  // https://api.waxpeer.com/v1/list-items-steam?api=4d0de41b32c608b308b6e74956a0b57675ce6e83d6788e02cb64db8cc440f2f0&game=csgo
+  //SAMPLE PAYLOAD
+  //   {
+  //     "items": [
+  //       {
+  //         "item_id": 27440807699,
+  //         "price": 2400000
+  //       }
+  //     ]
+  //   }
   console.log("listed item");
 }
 
 async function updateItemPricesOnWaxPeer(item: Array<UpdatedItemsType>) {
   console.log("updated item price");
+}
+
+async function getAllItemPrices(source: string) {
+  const settings = await prisma.settings.findUnique({
+    where: {
+      id: 1,
+    },
+  });
+  const apiKey: string = settings?.priceEmpireApiKey || "";
+  let myHeaders = new Headers();
+  myHeaders.append("accept", "application/json");
+  let requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+  };
+  const response = await fetch(
+    `https://pricempire.com/api/v3/getAllItems?api_key=${apiKey}&sources=${source}'`,
+    requestOptions
+  );
+  const { items } = await response.json();
+  return items;
 }

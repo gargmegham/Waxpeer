@@ -25,6 +25,22 @@ export type SelectedItem = {
   whenNoOneToUndercutListUsing: string;
 };
 
+export type ItemInDb = {
+  item_id: string;
+  name: string;
+  type: string;
+  source: string;
+  sourcePrice: number;
+  lastUpdated: Date;
+  undercutPrice: number;
+  undercutPercentage: number;
+  undercutByPriceOrPercentage: string;
+  priceRangeMin: number;
+  priceRangeMax: number;
+  priceRangePercentage: number;
+  whenNoOneToUndercutListUsing: string;
+};
+
 export type Item = {
   item_id: number;
   icon_url: string;

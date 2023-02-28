@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { cronSchedule } from "../../bot/chron";
+import { waxPeerBot } from "../../bot/bot";
 
 // GET /api/testbot
 export default async function handle(
@@ -20,7 +21,7 @@ export default async function handle(
       // }
       //   update settings
 
-      cronSchedule(10);
+      waxPeerBot();
       return res.status(200).json({ status: true });
     }
   } catch (e: any) {
