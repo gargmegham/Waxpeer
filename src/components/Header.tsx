@@ -11,8 +11,8 @@ const Header: React.FC = () => {
   return (
     <nav>
       <div className={styles.right}>
-        <Link href="/" legacyBehavior>
-          <a className={isActive("/") ? styles.bold : ""}>Listings</a>
+        <Link href="/listings" legacyBehavior>
+          <a className={isActive("/listings") ? styles.bold : ""}>Listings</a>
         </Link>
         <Link href="/inventory" legacyBehavior>
           <a className={isActive("/inventory") ? styles.bold : ""}>Inventory</a>

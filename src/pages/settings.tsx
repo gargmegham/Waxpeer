@@ -8,14 +8,14 @@ import {
   message,
   InputNumber,
   Form,
+  Select,
   Col,
   Row,
   Switch,
-  Space,
 } from "antd";
 import React from "react";
 import EditOutlined from "@ant-design/icons/EditOutlined";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { availableSources } from "../constants";
 
 const Settings: React.FC<any> = ({ settings }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
@@ -117,7 +117,7 @@ const Settings: React.FC<any> = ({ settings }) => {
           </Row>
           <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
             <Col span={4}>WaxPeer API limit</Col>
-            <Col span={8}>
+            <Col span={4}>
               <Form.Item
                 name="waxpeerRateLimit"
                 rules={[{ required: true, message: "Required field!" }]}
@@ -128,12 +128,10 @@ const Settings: React.FC<any> = ({ settings }) => {
                 />
               </Form.Item>
             </Col>
-          </Row>
-          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
             <Col span={4}>Price Empire API limit</Col>
-            <Col span={8}>
+            <Col span={4}>
               <Form.Item
-                name="PriceEmpireRateLimit"
+                name="priceEmpireRateLimit"
                 rules={[{ required: true, message: "Required field!" }]}
               >
                 <InputNumber
@@ -143,7 +141,197 @@ const Settings: React.FC<any> = ({ settings }) => {
               </Form.Item>
             </Col>
           </Row>
-          <Row>
+          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
+            <Col span={8}>
+              <Form.Item
+                label="Source"
+                name="source"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select a source",
+                  },
+                ]}
+              >
+                <Select
+                  defaultValue={settings.source}
+                  style={{ width: 230 }}
+                  options={availableSources.map((source: string) => ({
+                    label: source,
+                    value: source,
+                  }))}
+                >
+                  Source
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
+            <Col span={8}>
+              <Form.Item
+                label="Undercut Price"
+                name="undercutPrice"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input undercut price!",
+                  },
+                ]}
+              >
+                <InputNumber
+                  min={0}
+                  size="large"
+                  defaultValue={settings.undercutPrice}
+                  formatter={(value) =>
+                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label="Undercut Percentage"
+                name="undercutPercentage"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input undercut percentage!",
+                  },
+                ]}
+              >
+                <InputNumber
+                  min={0}
+                  size="large"
+                  defaultValue={settings.undercutPercentage}
+                  formatter={(value) => `${value}%`}
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label="Undercut By"
+                name="undercutByPriceOrPercentage"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select undercut by price or percentage!",
+                  },
+                ]}
+              >
+                <Select
+                  options={[
+                    {
+                      label: "Price",
+                      value: "price",
+                    },
+                    {
+                      label: "Percentage",
+                      value: "percentage",
+                    },
+                  ]}
+                  defaultValue={settings.undercutByPriceOrPercentage}
+                  style={{ width: 120 }}
+                >
+                  Undercut By
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
+            <Col span={8}>
+              <Form.Item
+                label="Price Range Min"
+                name="priceRangeMin"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input price range min!",
+                  },
+                ]}
+              >
+                <InputNumber
+                  min={0}
+                  size="large"
+                  defaultValue={settings.priceRangeMin}
+                  formatter={(value) =>
+                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label="Price Range Max"
+                name="priceRangeMax"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input price range max!",
+                  },
+                ]}
+              >
+                <InputNumber
+                  min={0}
+                  size="large"
+                  defaultValue={settings.priceRangeMax}
+                  formatter={(value) =>
+                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label="Price Range Min Percentage"
+                name="priceRangePercentage"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input price range percentage!",
+                  },
+                ]}
+              >
+                <InputNumber
+                  defaultValue={settings.priceRangePercentage}
+                  formatter={(value) => `${value}%`}
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
+            <Col span={16}>
+              <Form.Item
+                label="When No One To Undercut List Using"
+                name="whenNoOneToUndercutListUsing"
+                rules={[
+                  {
+                    required: true,
+                    message:
+                      "Please select when no one to undercut list using!",
+                  },
+                ]}
+              >
+                <Switch
+                  defaultChecked={
+                    settings.whenNoOneToUndercutListUsing === "max"
+                  }
+                  unCheckedChildren="Percentage"
+                  checkedChildren="Max"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          {/* <Row>
             <Form.List name="sights">
               {(fields, { add, remove }) => (
                 <>
@@ -200,7 +388,7 @@ const Settings: React.FC<any> = ({ settings }) => {
                 </>
               )}
             </Form.List>
-          </Row>
+          </Row> */}
           {editMode ? (
             <Row>
               <Col span={4}>
@@ -223,11 +411,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     where: {
       id: 1,
     },
-    include: {
-      priceRange: true,
-    },
   });
-  console.log(settings);
   return {
     props: {
       settings,
