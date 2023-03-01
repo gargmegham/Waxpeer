@@ -92,17 +92,19 @@ export default async function handle(
         return res.status(401).json({ error: "Unauthorized" });
       }
       // delete item from prisma model
-      const itemPk: any = req.body.id;
-      const item = await prisma.item.findUnique({
-        where: { id: itemPk },
-      });
-      if (!item) {
-        return res.status(404).json({ error: "Item not found." });
+      const itemPks: any = req.body.ids;
+      const deleteItemsBatch = [];
+      for (const itemPk of itemPks) {
+        if (typeof itemPk !== "number") {
+          return res.status(400).json({ error: "Invalid item id." });
+        }
+        const deleteItem = prisma.item.delete({
+          where: { id: itemPk },
+        });
+        deleteItemsBatch.push(deleteItem);
       }
-      const deletedItem = await prisma.item.delete({
-        where: { id: itemPk },
-      });
-      return res.status(200).json({ deletedItem, message: "Item deleted." });
+      await prisma.$transaction(deleteItemsBatch);
+      return res.status(200).json({ message: "Item deleted." });
     }
   } catch (e: any) {
     console.error(e);

@@ -17,14 +17,17 @@ const Listings: React.FC<any> = ({ items }) => {
     React.useState<any>(null);
   const [editItemModalItem, setEditItemModalItem] = React.useState<any>(null);
 
-  const deleteItem = async () => {
+  const deleteItem = async (deleteAll = false) => {
+    const ids = deleteAll
+      ? items.map((item: any) => item.id)
+      : [deleteConfirmModalItem.id];
     await fetch("/api/items", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      body: JSON.stringify({ id: deleteConfirmModalItem.id }),
+      body: JSON.stringify({ ids }),
     });
     message.success("Item deleted");
     setDeleteConfirmModalVisible(false);
@@ -35,7 +38,19 @@ const Listings: React.FC<any> = ({ items }) => {
 
   return (
     <Layout>
-      <Card title="Currently Live Bot Trades">
+      <Card
+        title="Currently Live Bot Trades"
+        extra={
+          <Button
+            type="primary"
+            onClick={() => {
+              deleteItem(true);
+            }}
+          >
+            Delete All
+          </Button>
+        }
+      >
         <Input
           placeholder="Search by name..."
           style={{ width: "100%", marginBottom: "10px" }}
