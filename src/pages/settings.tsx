@@ -12,15 +12,26 @@ import {
   Col,
   Row,
   Switch,
+  Table,
 } from "antd";
 import React from "react";
 import EditOutlined from "@ant-design/icons/EditOutlined";
 import { availableSources } from "../constants";
+import AddEditPriceRangeModal from "../components/AddEditPriceRangeModal";
 
 const Settings: React.FC<any> = ({ settings }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
+  const [priceRanges, setPriceRanges] = React.useState<any>(
+    settings.priceRange
+  );
+  const [showAddEditPriceRangeModal, setShowAddEditPriceRangeModal] =
+    React.useState<boolean>(false);
+  const [priceRangeToEdit, setPriceRangeToEdit] = React.useState<any>(null);
 
   const saveSettings = async (values: any) => {
+    values.undercutByPriceOrPercentage = values.undercutByPriceOrPercentage
+      ? "price"
+      : "percentage";
     setEditMode(false);
     await fetch("/api/settings", {
       method: "PUT",
@@ -31,6 +42,21 @@ const Settings: React.FC<any> = ({ settings }) => {
       body: JSON.stringify({ values }),
     });
     message.success("Settings updated!");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
+
+  const deleteRange = async (id: number) => {
+    await fetch("/api/pricerange", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ id }),
+    });
+    message.success("Price range deleted!");
     setTimeout(() => {
       window.location.reload();
     }, 1000);
@@ -58,6 +84,7 @@ const Settings: React.FC<any> = ({ settings }) => {
                 style={{ marginRight: "16px" }}
                 onClick={() => {
                   setEditMode(false);
+                  setPriceRanges(settings.priceRange);
                 }}
               >
                 Cancel
@@ -75,74 +102,7 @@ const Settings: React.FC<any> = ({ settings }) => {
           onFinish={saveSettings}
         >
           <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
-            <Col span={4}>Waxpeer API Key</Col>
-            <Col span={12}>
-              <Form.Item
-                name="waxpeerApiKey"
-                rules={[{ required: true, message: "Required field!" }]}
-              >
-                <Input
-                  disabled={!editMode}
-                  defaultValue={settings.waxpeerApiKey}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
-            <Col span={4}>Priceempire API Key</Col>
-            <Col span={12}>
-              <Form.Item
-                name="priceEmpireApiKey"
-                rules={[{ required: true, message: "Required field!" }]}
-              >
-                <Input
-                  disabled={!editMode}
-                  defaultValue={settings.priceEmpireApiKey}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
-            <Col span={4}>Status</Col>
-            <Col span={8}>
-              <Form.Item name="paused" valuePropName="paused">
-                <Switch
-                  defaultChecked={settings.paused}
-                  disabled={!editMode}
-                  checkedChildren={"Paused"}
-                  unCheckedChildren={"Running"}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
-            <Col span={4}>WaxPeer API limit</Col>
-            <Col span={4}>
-              <Form.Item
-                name="waxpeerRateLimit"
-                rules={[{ required: true, message: "Required field!" }]}
-              >
-                <InputNumber
-                  disabled={!editMode}
-                  defaultValue={settings.waxpeerRateLimit}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={4}>Price Empire API limit</Col>
-            <Col span={4}>
-              <Form.Item
-                name="priceEmpireRateLimit"
-                rules={[{ required: true, message: "Required field!" }]}
-              >
-                <InputNumber
-                  disabled={!editMode}
-                  defaultValue={settings.PriceEmpireRateLimit}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
-            <Col span={8}>
+            <Col span={6}>
               <Form.Item
                 label="Source"
                 name="source"
@@ -165,9 +125,7 @@ const Settings: React.FC<any> = ({ settings }) => {
                 </Select>
               </Form.Item>
             </Col>
-          </Row>
-          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
-            <Col span={8}>
+            <Col span={6}>
               <Form.Item
                 label="Undercut Price"
                 name="undercutPrice"
@@ -190,7 +148,7 @@ const Settings: React.FC<any> = ({ settings }) => {
                 />
               </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col span={6}>
               <Form.Item
                 label="Undercut Percentage"
                 name="undercutPercentage"
@@ -206,189 +164,77 @@ const Settings: React.FC<any> = ({ settings }) => {
                   size="large"
                   defaultValue={settings.undercutPercentage}
                   formatter={(value) => `${value}%`}
-                  // @ts-ignore
-                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                 />
               </Form.Item>
             </Col>
-            <Col span={8}>
-              <Form.Item
-                label="Undercut By"
-                name="undercutByPriceOrPercentage"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select undercut by price or percentage!",
-                  },
-                ]}
-              >
-                <Select
-                  options={[
-                    {
-                      label: "Price",
-                      value: "price",
-                    },
-                    {
-                      label: "Percentage",
-                      value: "percentage",
-                    },
-                  ]}
-                  defaultValue={settings.undercutByPriceOrPercentage}
-                  style={{ width: 120 }}
-                >
-                  Undercut By
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
-            <Col span={8}>
-              <Form.Item
-                label="Price Range Min"
-                name="priceRangeMin"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input price range min!",
-                  },
-                ]}
-              >
-                <InputNumber
-                  min={0}
-                  size="large"
-                  defaultValue={settings.priceRangeMin}
-                  formatter={(value) =>
-                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
-                  // @ts-ignore
-                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                label="Price Range Max"
-                name="priceRangeMax"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input price range max!",
-                  },
-                ]}
-              >
-                <InputNumber
-                  min={0}
-                  size="large"
-                  defaultValue={settings.priceRangeMax}
-                  formatter={(value) =>
-                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
-                  // @ts-ignore
-                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                label="Price Range Min Percentage"
-                name="priceRangePercentage"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input price range percentage!",
-                  },
-                ]}
-              >
-                <InputNumber
-                  defaultValue={settings.priceRangePercentage}
-                  formatter={(value) => `${value}%`}
-                  // @ts-ignore
-                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
-            <Col span={16}>
-              <Form.Item
-                label="When No One To Undercut List Using"
-                name="whenNoOneToUndercutListUsing"
-                rules={[
-                  {
-                    required: true,
-                    message:
-                      "Please select when no one to undercut list using!",
-                  },
-                ]}
-              >
+            <Col span={6}>
+              <Form.Item label="Undercut By" name="undercutByPriceOrPercentage">
                 <Switch
                   defaultChecked={
-                    settings.whenNoOneToUndercutListUsing === "max"
+                    settings.undercutByPriceOrPercentage === "price"
                   }
                   unCheckedChildren="Percentage"
-                  checkedChildren="Max"
+                  checkedChildren="Price"
                 />
               </Form.Item>
             </Col>
           </Row>
-          {/* <Row>
-            <Form.List name="sights">
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map((field) => (
-                    <Space key={field.key} align="baseline">
-                      <Form.Item
-                        {...field}
-                        label="Price"
-                        name={[field.name, "price"]}
-                        rules={[{ required: true, message: "Missing price" }]}
-                      >
-                        <Input />
-                      </Form.Item>
-                      <Form.Item
-                        {...field}
-                        label="Price"
-                        name={[field.name, "price"]}
-                        rules={[{ required: true, message: "Missing price" }]}
-                      >
-                        <Input />
-                      </Form.Item>
-                      <Form.Item
-                        {...field}
-                        label="Price"
-                        name={[field.name, "price"]}
-                        rules={[{ required: true, message: "Missing price" }]}
-                      >
-                        <Input />
-                      </Form.Item>
-                      <Form.Item
-                        {...field}
-                        label="Price"
-                        name={[field.name, "price"]}
-                        rules={[{ required: true, message: "Missing price" }]}
-                      >
-                        <Input />
-                      </Form.Item>
-
-                      <MinusCircleOutlined onClick={() => remove(field.name)} />
-                    </Space>
-                  ))}
-                  <Row>
-                    <Form.Item>
-                      <Button
-                        type="dashed"
-                        onClick={() => add()}
-                        block
-                        icon={<PlusOutlined />}
-                      >
-                        Add sights
-                      </Button>
-                    </Form.Item>
-                  </Row>
-                </>
-              )}
-            </Form.List>
-          </Row> */}
+          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
+            <Col span={4}>Waxpeer API Key</Col>
+            <Col span={12}>
+              <Form.Item
+                name="waxpeerApiKey"
+                rules={[{ required: true, message: "Required field!" }]}
+              >
+                <Input
+                  disabled={!editMode}
+                  defaultValue={settings.waxpeerApiKey}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
+            <Col span={4}>Priceempire API Key</Col>
+            <Col span={12}>
+              <Form.Item name="priceEmpireApiKey">
+                <Input
+                  disabled={!editMode}
+                  defaultValue={settings.priceEmpireApiKey}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
+            <Col span={4}>Status</Col>
+            <Col span={4}>
+              <Form.Item name="paused" valuePropName="paused">
+                <Switch
+                  defaultChecked={settings.paused}
+                  disabled={!editMode}
+                  checkedChildren={"Paused"}
+                  unCheckedChildren={"Running"}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={4}>WaxPeer API Frequency (Per Minute)</Col>
+            <Col span={4}>
+              <Form.Item name="waxpeerRateLimit">
+                <InputNumber
+                  disabled={!editMode}
+                  defaultValue={settings.waxpeerRateLimit}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={4}>PriceEmpire API Frequency (Per Minute)</Col>
+            <Col span={4}>
+              <Form.Item name="priceEmpireRateLimit">
+                <InputNumber
+                  disabled={!editMode}
+                  defaultValue={settings.PriceEmpireRateLimit}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
           {editMode ? (
             <Row>
               <Col span={4}>
@@ -402,6 +248,153 @@ const Settings: React.FC<any> = ({ settings }) => {
           ) : null}
         </Form>
       </Card>
+      <Card
+        style={{ marginTop: "20px" }}
+        title="Price Ranges"
+        extra={
+          <Button
+            style={{ marginLeft: "16px", marginTop: "14px" }}
+            type="primary"
+          >
+            + Add
+          </Button>
+        }
+      >
+        <Table
+          dataSource={priceRanges}
+          columns={[
+            {
+              title: "From",
+              dataIndex: "sourcePriceMin",
+              render: (text: any, record: any) => (
+                <InputNumber
+                  min={0}
+                  size="large"
+                  disabled={true}
+                  defaultValue={record.sourcePriceMin}
+                  formatter={(value) =>
+                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              ),
+            },
+            {
+              title: "To",
+              dataIndex: "sourcePriceMax",
+              render: (text: any, record: any) => (
+                <InputNumber
+                  min={0}
+                  disabled={true}
+                  size="large"
+                  defaultValue={record.sourcePriceMax}
+                  formatter={(value) =>
+                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              ),
+            },
+            {
+              title: "Price Range Min",
+              dataIndex: "priceRangeMin",
+              render: (text: any, record: any) => (
+                <InputNumber
+                  min={0}
+                  size="large"
+                  disabled={true}
+                  defaultValue={record.priceRangeMin}
+                  formatter={(value) => `${value}%`}
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              ),
+            },
+            {
+              title: "Price Range Max",
+              dataIndex: "priceRangeMax",
+              render: (text: any, record: any) => (
+                <InputNumber
+                  min={0}
+                  disabled={true}
+                  size="large"
+                  defaultValue={record.priceRangeMax}
+                  formatter={(value) => `${value}%`}
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              ),
+            },
+            {
+              title: "Price Range Percentage",
+              dataIndex: "priceRangePercentage",
+              render: (text: any, record: any) => (
+                <InputNumber
+                  min={0}
+                  disabled={true}
+                  size="large"
+                  defaultValue={record.priceRangePercentage}
+                  formatter={(value) => `${value}%`}
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              ),
+            },
+            {
+              title: "When No One To Undercut",
+              dataIndex: "whenNoOneToUndercutListUsing",
+              render: (text: any, record: any) => (
+                <Switch
+                  defaultChecked={
+                    record.whenNoOneToUndercutListUsing === "max" ? true : false
+                  }
+                  unCheckedChildren="Percentage"
+                  disabled={true}
+                  checkedChildren="Max"
+                />
+              ),
+            },
+            {
+              title: "Delete",
+              dataIndex: "delete",
+              render: (text: any, record: any, index: number) => (
+                <>
+                  <Button
+                    style={{ marginRight: "16px" }}
+                    type="primary"
+                    onClick={() => {
+                      setPriceRangeToEdit(record);
+                      setShowAddEditPriceRangeModal(true);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    type="primary"
+                    danger
+                    onClick={() => {
+                      deleteRange(record.id);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </>
+              ),
+            },
+          ]}
+        />
+      </Card>
+      {showAddEditPriceRangeModal ? (
+        <AddEditPriceRangeModal
+          showModal={showAddEditPriceRangeModal}
+          setPriceRangeToEdit={setPriceRangeToEdit}
+          setShowModal={setShowAddEditPriceRangeModal}
+          priceRange={priceRangeToEdit}
+          action={priceRangeToEdit ? "edit" : "add"}
+        />
+      ) : null}
     </Layout>
   );
 };
@@ -410,6 +403,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const settings = await prisma.settings.findUnique({
     where: {
       id: 1,
+    },
+    include: {
+      priceRange: true,
     },
   });
   return {

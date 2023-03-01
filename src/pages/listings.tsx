@@ -6,7 +6,7 @@ import EditOutlined from "@ant-design/icons/EditOutlined";
 import DeleteOutlined from "@ant-design/icons/DeleteOutlined";
 import { GetServerSideProps } from "next";
 import EditItemModal from "../components/EditItemModal";
-
+import { CheckCircleTwoTone, StopTwoTone } from "@ant-design/icons";
 const Listings: React.FC<any> = ({ items }) => {
   const [search, setSearch] = React.useState<string>("");
   const [editItemModalVisible, setEditItemModalVisible] =
@@ -58,12 +58,12 @@ const Listings: React.FC<any> = ({ items }) => {
               title: "Name",
               dataIndex: "name",
               fixed: "left",
-              width: 250,
+              width: 150,
             },
             {
               title: "Edit/Delete",
               fixed: "left",
-              width: 150,
+              width: 100,
               render: (val: string, record: any, index: number) => {
                 return (
                   <>
@@ -89,6 +89,31 @@ const Listings: React.FC<any> = ({ items }) => {
               },
             },
             {
+              title: "Status",
+              dataIndex: "botSuccess",
+              fixed: "left",
+              width: 150,
+              render: (botSuccess: boolean, record: any) => {
+                return (
+                  <>
+                    {botSuccess ? (
+                      <CheckCircleTwoTone twoToneColor="#52c41a" />
+                    ) : (
+                      <StopTwoTone twoToneColor="#cc3434" />
+                    )}{" "}
+                    <span
+                      style={{
+                        color: botSuccess ? "#52c41a" : "#cc3434",
+                        marginLeft: "6px",
+                      }}
+                    >
+                      {record.message}
+                    </span>
+                  </>
+                );
+              },
+            },
+            {
               title: "Source Price",
               dataIndex: "sourcePrice",
               sortDirections: ["descend", "ascend"],
@@ -99,7 +124,7 @@ const Listings: React.FC<any> = ({ items }) => {
                     min={0}
                     size="large"
                     disabled={true}
-                    defaultValue={sourcePrice}
+                    defaultValue={sourcePrice || "-"}
                     formatter={(value) =>
                       `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     }
@@ -108,7 +133,7 @@ const Listings: React.FC<any> = ({ items }) => {
                   />
                 );
               },
-              width: 150,
+              width: 100,
             },
             {
               title: "Current Price",
@@ -121,7 +146,7 @@ const Listings: React.FC<any> = ({ items }) => {
                     min={0}
                     size="large"
                     disabled={true}
-                    defaultValue={sourcePrice}
+                    defaultValue={sourcePrice || "-"}
                     formatter={(value) =>
                       `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     }
@@ -130,12 +155,12 @@ const Listings: React.FC<any> = ({ items }) => {
                   />
                 );
               },
-              width: 150,
+              width: 100,
             },
             {
               title: "Range Min",
               dataIndex: "priceRangeMin",
-              width: 130,
+              width: 100,
               sortDirections: ["descend", "ascend"],
               sorter: (a: any, b: any) => a.item_id - b.item_id,
               render: (priceRangeMin: number, record: any) => {
@@ -144,7 +169,7 @@ const Listings: React.FC<any> = ({ items }) => {
                     min={0}
                     size="large"
                     disabled={true}
-                    defaultValue={priceRangeMin}
+                    defaultValue={priceRangeMin || "-"}
                     formatter={(value) =>
                       `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     }
@@ -156,7 +181,7 @@ const Listings: React.FC<any> = ({ items }) => {
             },
             {
               title: "Range Max",
-              width: 130,
+              width: 100,
               dataIndex: "priceRangeMax",
               sortDirections: ["descend", "ascend"],
               sorter: (a: any, b: any) => a.item_id - b.item_id,
@@ -166,7 +191,7 @@ const Listings: React.FC<any> = ({ items }) => {
                     min={0}
                     size="large"
                     disabled={true}
-                    defaultValue={priceRangeMax}
+                    defaultValue={priceRangeMax || "-"}
                     formatter={(value) =>
                       `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     }
@@ -178,7 +203,7 @@ const Listings: React.FC<any> = ({ items }) => {
             },
             {
               title: "Price Percentage",
-              width: 130,
+              width: 100,
               dataIndex: "priceRangePercentage",
               sortDirections: ["descend", "ascend"],
               sorter: (a: any, b: any) => a.item_id - b.item_id,
@@ -186,7 +211,7 @@ const Listings: React.FC<any> = ({ items }) => {
                 return (
                   <InputNumber
                     disabled={true}
-                    defaultValue={priceRangePercentage}
+                    defaultValue={priceRangePercentage || "-"}
                     formatter={(value) => `${value}%`}
                     // @ts-ignore
                     parser={(value) => value!.replace("%", "")}
@@ -242,6 +267,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
       undercutPercentage: true,
       undercutByPriceOrPercentage: true,
       priceRangeMin: true,
+      botSuccess: true,
+      message: true,
       priceRangeMax: true,
       priceRangePercentage: true,
       whenNoOneToUndercutListUsing: true,

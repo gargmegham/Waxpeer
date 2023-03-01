@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { signingKey } from "../../constants";
 import prisma from "../../lib/prisma";
-import { SelectedItem } from "../../types";
+import { Item } from "../../types";
 
 // POST /api/priceempire
 export default async function handle(
@@ -21,31 +21,32 @@ export default async function handle(
         return res.status(401).json({ error: "Unauthorized" });
       }
       // fetch data from priceempire
-      const items: Array<SelectedItem> = req.body.items;
+      const items: Array<Item> = req.body.items;
+      const settings = await prisma.settings.findUnique({
+        where: { id: 1 },
+        include: { priceRange: true },
+      });
+      if (!settings) {
+        return res.status(404).json({ error: "Settings not found." });
+      }
       // create items in prisma model
-      const response: any = {};
+      const batchItems = [];
       for (const item of items) {
-        const newItem = await prisma.item.create({
+        const newItem = prisma.item.create({
           data: {
             name: item.name,
             type: item.type,
             item_id: String(item.item_id),
-            source: item.source,
-            sourcePrice: item.sourcePrice,
-            currentPrice: 0,
-            lastUpdated: item.lastUpdated,
-            undercutPrice: item.undercutPrice,
-            undercutPercentage: item.undercutPercentage,
-            undercutByPriceOrPercentage: item.undercutByPriceOrPercentage,
-            priceRangeMin: item.priceRangeMin,
-            priceRangeMax: item.priceRangeMax,
-            priceRangePercentage: item.priceRangePercentage,
-            whenNoOneToUndercutListUsing: item.whenNoOneToUndercutListUsing,
+            source: settings.source,
+            undercutPrice: settings.undercutPrice,
+            undercutPercentage: settings.undercutPercentage,
+            undercutByPriceOrPercentage: settings.undercutByPriceOrPercentage,
           },
         });
-        response[item.item_id] = newItem;
+        batchItems.push(newItem);
       }
-      return res.status(201).json(JSON.stringify(response));
+      await prisma.$transaction(batchItems);
+      return res.status(201).json(JSON.stringify({}));
     } else if (req.method === "PUT") {
       // verify bearer token
       const jwt = require("jsonwebtoken");
@@ -69,9 +70,6 @@ export default async function handle(
       const updatedItem = await prisma.item.update({
         where: { id: itemPrismaPk },
         data: {
-          source: item.source,
-          sourcePrice: item.sourcePrice,
-          lastUpdated: new Date(),
           undercutPrice: item.undercutPrice,
           undercutPercentage: item.undercutPercentage,
           undercutByPriceOrPercentage: item.undercutByPriceOrPercentage,
@@ -107,6 +105,7 @@ export default async function handle(
       return res.status(200).json({ deletedItem, message: "Item deleted." });
     }
   } catch (e: any) {
+    console.error(e);
     res.status(500).json({ error: e.message });
   }
 }

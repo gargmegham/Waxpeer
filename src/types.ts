@@ -91,3 +91,14 @@ export type ListItem = {
   item_id: string;
   price: number;
 };
+
+export type PriceRange = {
+  id: number;
+  settingsId: number;
+  sourcePriceMin: number;
+  sourcePriceMax: number;
+  priceRangeMin: number;
+  priceRangeMax: number;
+  priceRangePercentage: number;
+  whenNoOneToUndercutListUsing: string;
+};

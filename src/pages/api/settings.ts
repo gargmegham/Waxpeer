@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../lib/prisma";
 import { signingKey } from "../../constants";
-import { cronSchedule } from "../../bot/chron";
 
 // GET /api/inventory
 export default async function handle(
@@ -30,17 +29,16 @@ export default async function handle(
           waxpeerApiKey: String(values.waxpeerApiKey),
           priceEmpireApiKey: String(values.priceEmpireApiKey),
           waxpeerRateLimit: values.waxpeerRateLimit,
-          PriceEmpireRateLimit: values.PriceEmpireRateLimit,
+          priceEmpireRateLimit: values.priceEmpireRateLimit,
           paused: Boolean(values.paused),
+          source: String(values.source),
+          undercutPrice: values.undercutPrice,
+          undercutPercentage: values.undercutPercentage,
+          undercutByPriceOrPercentage: String(
+            values.undercutByPriceOrPercentage
+          ),
         },
       });
-      // values.priceRange
-      // const updatedPriceRange = await prisma.priceRange.upsert({
-      //   where: {
-      //     settingsId: updatedSettings.id,
-      //   },
-      // });
-      // cronSchedule(Number(values.botInterval));
       return res.status(200).json(updatedSettings);
     }
   } catch (e: any) {

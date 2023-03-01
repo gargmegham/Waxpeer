@@ -69,7 +69,8 @@ export async function waxPeerBot() {
             id: itemToBeTraded.id,
           },
           data: {
-            botRunStatus: "Cannot fetch source price",
+            message: "Cannot fetch source price",
+            botSuccess: false,
           },
         });
         console.log("Cannot fetch source price");
