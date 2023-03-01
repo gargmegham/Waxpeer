@@ -255,6 +255,10 @@ const Settings: React.FC<any> = ({ settings }) => {
           <Button
             style={{ marginLeft: "16px", marginTop: "14px" }}
             type="primary"
+            onClick={() => {
+              setPriceRangeToEdit(null);
+              setShowAddEditPriceRangeModal(true);
+            }}
           >
             + Add
           </Button>

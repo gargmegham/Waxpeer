@@ -24,7 +24,7 @@ const AddEditPriceRangeModal: React.FC<any> = ({
   );
 
   const submit = async () => {
-    if (priceRange.id) {
+    if (priceRange && priceRange.id) {
       await fetch("/api/pricerange", {
         method: "PUT",
         headers: {
@@ -32,6 +32,16 @@ const AddEditPriceRangeModal: React.FC<any> = ({
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({ values: inputs, id: priceRange.id }),
+      });
+      message.success("Item edited successfully!");
+    } else {
+      await fetch("/api/pricerange", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ values: inputs }),
       });
       message.success("Item edited successfully!");
     }
