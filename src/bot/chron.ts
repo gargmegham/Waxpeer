@@ -1,9 +1,10 @@
 import cron from "node-cron";
-import { waxPeerBot } from "./bot";
+import { waxPeerBot } from "./waxpeer";
+import { priceEmpireBot } from "./priceempire";
 
 function action() {
-  console.log("The bot is running");
   waxPeerBot();
+  priceEmpireBot();
 }
 
 export function cronSchedule() {

@@ -18,7 +18,7 @@ export async function waxPeerBot() {
     where: { id: 1 },
   });
   const maxBotWaitLimit = Math.max(
-    settings?.PriceEmpireRateLimit || 1,
+    settings?.priceEmpireRateLimit || 1,
     settings?.waxpeerRateLimit || 1
   );
   //if bot is paused return
