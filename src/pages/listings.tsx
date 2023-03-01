@@ -131,10 +131,10 @@ const Listings: React.FC<any> = ({ items }) => {
             {
               title: "Float",
               dataIndex: "floatCondition",
-              width: 150,
+              width: 100,
               render: (floatCondition: number) => {
                 return (
-                  <Input
+                  <InputNumber
                     size="large"
                     disabled={true}
                     defaultValue={floatCondition || "-"}
