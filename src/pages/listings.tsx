@@ -129,6 +129,21 @@ const Listings: React.FC<any> = ({ items }) => {
               },
             },
             {
+              title: "Float",
+              dataIndex: "floatCondition",
+              width: 150,
+              render: (floatCondition: number) => {
+                return (
+                  <Input
+                    size="large"
+                    disabled={true}
+                    defaultValue={floatCondition || "-"}
+                  />
+                );
+              },
+              sorter: (a: any, b: any) => a.item_id - b.item_id,
+            },
+            {
               title: "Source Price",
               dataIndex: "sourcePrice",
               sortDirections: ["descend", "ascend"],
@@ -283,6 +298,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       undercutByPriceOrPercentage: true,
       priceRangeMin: true,
       botSuccess: true,
+      floatCondition: true,
       message: true,
       priceRangeMax: true,
       priceRangePercentage: true,
