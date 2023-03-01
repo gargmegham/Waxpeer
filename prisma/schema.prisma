@@ -62,4 +62,5 @@ model Item {
   whenNoOneToUndercutListUsing String?
   botSuccess Boolean @default(false)
   message String @default("Not started yet")
+  floatCondition String?
 }

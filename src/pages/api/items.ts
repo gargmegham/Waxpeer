@@ -92,7 +92,7 @@ export default async function handle(
         return res.status(401).json({ error: "Unauthorized" });
       }
       // delete item from prisma model
-      const itemPks: any = req.body.ids;
+      const itemPks: Array<number> = req.body.ids;
       const deleteItemsBatch = [];
       for (const itemPk of itemPks) {
         if (typeof itemPk !== "number") {
@@ -104,6 +104,26 @@ export default async function handle(
         deleteItemsBatch.push(deleteItem);
       }
       await prisma.$transaction(deleteItemsBatch);
+      // remove items from waxpeer
+      const settings = await prisma.settings.findUnique({
+        where: {
+          id: 1,
+        },
+      });
+      const apiKey: string = settings?.waxpeerApiKey || "";
+      if (apiKey) {
+        let myHeaders = new Headers();
+        myHeaders.append("accept", "application/json");
+        let requestOptions = {
+          method: "GET",
+          headers: myHeaders,
+        };
+        let url = `https://api.waxpeer.com/v1/remove-items?api=${apiKey}`;
+        for (const id of itemPks) {
+          url += `&id=${id}`;
+        }
+        await fetch(url, requestOptions);
+      }
       return res.status(200).json({ message: "Item deleted." });
     }
   } catch (e: any) {
