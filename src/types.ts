@@ -43,6 +43,7 @@ export type ItemInDb = {
   botSuccess: boolean;
   message: string;
   floatCondition: number | null;
+  currentPrice: number;
 };
 
 export type Item = {
@@ -104,4 +105,9 @@ export type PriceRange = {
   priceRangeMax: number;
   priceRangePercentage: number;
   whenNoOneToUndercutListUsing: string;
+};
+
+export type PrimsaUpdateArgumnt = {
+  where: object;
+  data: object;
 };

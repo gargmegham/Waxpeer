@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { cronSchedule } from "../../bot/chron";
+import cronSchedule from "../../bot/chron";
 import { waxPeerBot } from "../../bot/waxpeer";
+import { priceEmpireBot } from "@/bot/priceempire";
 
 // GET /api/testbot
 export default async function handle(
@@ -20,6 +21,9 @@ export default async function handle(
       //   return res.status(401).json({ error: "Unauthorized" });
       // }
       //   update settings
+
+      //   cronSchedule(priceEmpireBot);
+      //   priceEmpireBot();
 
       waxPeerBot();
       return res.status(200).json({ status: true });

@@ -14,6 +14,7 @@ model User {
   password String?
   username String @unique
   botLastRun DateTime?
+  priceEmpireLastRun DateTime?
 }
 
 model Settings {

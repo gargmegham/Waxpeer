@@ -1,10 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import prisma from "../lib/prisma";
 import { WaxPeerSearchItemResult, UpdatedItemsType, ItemInDb } from "../types";
-import mockedResponse from "../mockedResponse";
 
 dayjs.extend(relativeTime);
 
@@ -16,11 +14,11 @@ export async function waxPeerBot() {
   });
   const settings = await prisma.settings.findUnique({
     where: { id: 1 },
+    include: { priceRange: true },
   });
-  const maxBotWaitLimit = Math.max(
-    settings?.priceEmpireRateLimit || 1,
-    settings?.waxpeerRateLimit || 1
-  );
+
+  const maxBotWaitLimit = settings?.waxpeerRateLimit || 1;
+
   //if bot is paused return
   if (settings?.paused) {
     console.log("bot is paused");
@@ -35,7 +33,7 @@ export async function waxPeerBot() {
     ) < maxBotWaitLimit
   ) {
     console.log("bot didn't run waiting...");
-    return;
+    // return;
   }
 
   const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
@@ -66,22 +64,16 @@ export async function waxPeerBot() {
       botDidntRun.push(itemToBeTraded);
       return;
     }
-
-    const minRange: number =
-      (itemToBeTraded.priceRangeMin / 100) * (sourcePrice / 100);
-    const maxRange: number =
-      (itemToBeTraded.priceRangeMax / 100) * (sourcePrice / 100);
-
     const searchedItems = await searchItemsInWaxPeer(itemToBeTraded.name);
 
     const itemsWithinPriceRange = searchedItems.filter(
       (item: WaxPeerSearchItemResult) =>
-        minRange >= item.price / 1000 &&
-        item.price / 1000 <= maxRange &&
+        itemToBeTraded.priceRangeMin >= item.price / 1000 &&
+        item.price / 1000 <= itemToBeTraded.priceRangeMax &&
         item.item_id !== itemToBeTraded.item_id
     );
 
-    console.log(minRange, maxRange, itemsWithinPriceRange);
+    console.log(itemToBeTraded, itemsWithinPriceRange);
 
     let newPrice: number = 0;
 
@@ -102,10 +94,9 @@ export async function waxPeerBot() {
     } //if there are no items in price range
     else {
       if (itemToBeTraded.whenNoOneToUndercutListUsing === "percentage") {
-        newPrice =
-          (sourcePrice / 100) * (itemToBeTraded.priceRangePercentage / 100);
+        newPrice = sourcePrice * (itemToBeTraded.priceRangePercentage / 100);
       } else {
-        newPrice = maxRange;
+        newPrice = itemToBeTraded.priceRangeMax;
       }
     }
 
@@ -121,6 +112,7 @@ export async function waxPeerBot() {
     }
     botRun.push(itemToBeTraded);
   });
+  //update bot last run
   await prisma.user.update({
     where: {
       username: "admin",
@@ -131,6 +123,7 @@ export async function waxPeerBot() {
   });
   console.log(updateItemPrice, listItems, "djhf");
 
+  // update bot run status
   try {
     await prisma.item.updateMany({
       where: {
@@ -158,7 +151,6 @@ export async function waxPeerBot() {
     console.log("error in updating bot status", err);
   }
 
-  return;
   updateItemPricesOnWaxPeer(updateItemPrice);
   listItemsOnWaxPeer(listItems);
 }
@@ -214,14 +206,16 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
     let requestOptions = {
       method: "POST",
       headers: myHeaders,
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        items: data,
+      }),
     };
     const response = await fetch(
       `https://api.waxpeer.com/v1/list-items-steam?api=${apiKey}&game=csgo`,
       requestOptions
     );
     const listed = await response.json();
-    console.log("listed item");
+    console.log("listed item", listed);
   } catch (err) {
     console.log("error while listing items", err);
   }
@@ -256,40 +250,17 @@ async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
     let requestOptions = {
       method: "POST",
       headers: myHeaders,
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        items: data,
+      }),
     };
     const response = await fetch(
       `https://api.waxpeer.com/v1/edit-items?api=${apiKey}&game=csgo`,
       requestOptions
     );
     const updated = await response.json();
-    console.log("updated item price");
+    console.log("updated item price", updated);
   } catch (err) {
     console.log("error while updating prices on wax peer");
-  }
-}
-
-async function getAllItemPrices(source: string) {
-  try {
-    const settings = await prisma.settings.findUnique({
-      where: {
-        id: 1,
-      },
-    });
-    const apiKey: string = settings?.priceEmpireApiKey || "";
-    let myHeaders = new Headers();
-    myHeaders.append("accept", "application/json");
-    let requestOptions = {
-      method: "GET",
-      headers: myHeaders,
-    };
-    const response = await fetch(
-      `https://pricempire.com/api/v3/getAllItems?api_key=${apiKey}&sources=${source}'`,
-      requestOptions
-    );
-    const { items } = await response.json();
-    return items;
-  } catch (err) {
-    console.log("getting prices error", err);
   }
 }
