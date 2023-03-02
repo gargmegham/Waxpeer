@@ -7,56 +7,50 @@ import { ItemInDb, PrimsaUpdateArgumnt } from "../types";
 dayjs.extend(relativeTime);
 
 export async function updateFloatBot() {
-  const botLastRun = await prisma.user.findUnique({
-    where: {
-      username: "admin",
-    },
-  });
-  const settings = await prisma.settings.findUnique({
-    where: { id: 1 },
-    include: { priceRange: true },
-  });
+  try {
+    const botLastRun = await prisma.user.findUnique({
+      where: {
+        username: "admin",
+      },
+    });
 
-  const maxBotWaitLimit = settings?.waxpeerRateLimit || 1;
+    const settings = await prisma.settings.findUnique({
+      where: { id: 1 },
+      include: { priceRange: true },
+    });
+    if (settings?.paused) return;
 
-  //if bot is paused return
-  if (settings?.paused) {
-    console.log("update float bot is paused");
-    return;
+    if (
+      dayjs(new Date()).diff(
+        new Date(botLastRun?.botLastRun || new Date()),
+        "hour"
+      ) < 24
+    )
+      return;
+
+    const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
+    let updateItems: Array<PrimsaUpdateArgumnt> = [];
+    for (const itemToTrade of itemsNeedTobeTraded) {
+      const items = await getFloat(itemToTrade.name);
+      if (items.length > 0)
+        updateItems.push({
+          where: {
+            id: itemToTrade.id,
+          },
+          data: {
+            floatCondition: items[0].float,
+          },
+        });
+    }
+    await prisma.$transaction(
+      updateItems.map((item) => prisma.item.update(item))
+    );
+  } catch (err) {
+    console.log("update float bot error");
   }
-
-  //do not run bot if last run from now is less than wait time
-  if (
-    dayjs(new Date()).diff(
-      new Date(botLastRun?.botLastRun || new Date()),
-      "hour"
-    ) < 24
-  ) {
-    console.log("update float bot didn't run waiting...");
-    return;
-  }
-
-  const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
-  let updateItems: Array<PrimsaUpdateArgumnt> = [];
-  for (const itemToTrade of itemsNeedTobeTraded) {
-    const items = await getFloat(itemToTrade.name);
-    if (items.length)
-      updateItems.push({
-        where: {
-          id: itemToTrade.id,
-        },
-        data: {
-          floatCondition: items[0].float,
-        },
-      });
-  }
-  await prisma.$transaction(
-    updateItems.map((item) => prisma.item.update(item))
-  );
 }
 
 async function getFloat(itemName: string) {
-  //api.waxpeer.com/docs/#/Steam/get_get_items_list
   try {
     const settings = await prisma.settings.findUnique({
       where: {
