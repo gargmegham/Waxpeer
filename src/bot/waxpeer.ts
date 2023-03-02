@@ -64,8 +64,8 @@ export async function waxPeerBot() {
         (item: WaxPeerSearchItemResult) =>
           itemToBeTraded.priceRangeMin &&
           itemToBeTraded.priceRangeMax &&
-          itemToBeTraded.priceRangeMin >= item.price / 1000 &&
-          item.price / 1000 <= itemToBeTraded.priceRangeMax &&
+          itemToBeTraded.priceRangeMin <= item.price / 1000 &&
+          item.price / 1000 < itemToBeTraded.priceRangeMax &&
           item.item_id !== itemToBeTraded.item_id
       );
       let newPrice = 0;
@@ -94,11 +94,13 @@ export async function waxPeerBot() {
       );
       if (currentItem && Object.values(currentItem).length > 0) {
         updateItemPrice.push({
+          id: currentItem.id,
           item_id: currentItem.item_id,
           price: Math.floor(newPrice * 1000),
         });
       } else {
         listItems.push({
+          id: itemToBeTraded.id,
           item_id: itemToBeTraded.item_id,
           price: Math.floor(newPrice * 1000),
         });
@@ -158,7 +160,10 @@ async function searchItemsInWaxPeer(itemName: string) {
 async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
   try {
     const payload = {
-      items,
+      items: items.map((item) => ({
+        item_id: item.item_id,
+        price: item.price,
+      })),
     };
 
     console.log(JSON.stringify(payload));
@@ -182,6 +187,20 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
     );
     const listed = await response.json();
     console.log("listed item", listed);
+    if (listed.success) {
+      await prisma.$transaction(
+        items.map((item) =>
+          prisma.item.update({
+            where: {
+              id: item.id,
+            },
+            data: {
+              currentPrice: item.price / 1000,
+            },
+          })
+        )
+      );
+    }
   } catch (err) {
     console.log("error while listing items", err);
   }
@@ -190,7 +209,10 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
 async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
   try {
     const payload = {
-      items,
+      items: items.map((item) => ({
+        item_id: item.item_id,
+        price: item.price,
+      })),
     };
 
     console.log(payload);
@@ -213,6 +235,20 @@ async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
     );
     const updated = await response.json();
     console.log("updated item price", updated);
+    if (updated.success) {
+      await prisma.$transaction(
+        items.map((item) =>
+          prisma.item.update({
+            where: {
+              id: item.id,
+            },
+            data: {
+              currentPrice: item.price / 1000,
+            },
+          })
+        )
+      );
+    }
   } catch (err) {
     console.log("error while updating prices on wax peer");
   }
