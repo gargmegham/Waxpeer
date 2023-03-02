@@ -3,7 +3,6 @@ import { signingKey } from "../../constants";
 import prisma from "../../lib/prisma";
 import { Item } from "../../types";
 
-// POST /api/priceempire
 export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse

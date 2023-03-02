@@ -271,7 +271,7 @@ const Listings: React.FC<any> = ({ items }) => {
           okText="Delete"
           cancelText="No"
           open={deleteConfirmModalVisible}
-          onOk={deleteItem}
+          onOk={() => deleteItem()}
           onCancel={() => setDeleteConfirmModalVisible(false)}
         >
           <p>Are you sure you want to delete this item?</p>
