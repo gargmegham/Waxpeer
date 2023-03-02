@@ -23,7 +23,6 @@ export async function waxPeerBot() {
 
     //if bot is paused return
     if (settings?.paused) {
-      console.log("bot is paused");
       return;
     }
 
@@ -34,8 +33,7 @@ export async function waxPeerBot() {
         "minute"
       ) < maxBotWaitLimit
     ) {
-      console.log("bot didn't run waiting...");
-      // return;
+      return;
     }
 
     const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
@@ -165,9 +163,6 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
         price: item.price,
       })),
     };
-
-    console.log(JSON.stringify(payload));
-
     const settings = await prisma.settings.findUnique({
       where: {
         id: 1,
@@ -214,8 +209,6 @@ async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
         price: item.price,
       })),
     };
-
-    console.log(payload);
     const settings = await prisma.settings.findUnique({
       where: {
         id: 1,
@@ -234,7 +227,6 @@ async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
       requestOptions
     );
     const updated = await response.json();
-    console.log("updated item price", updated);
     if (updated.success) {
       await prisma.$transaction(
         items.map((item) =>
