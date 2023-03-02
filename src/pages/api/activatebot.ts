@@ -3,6 +3,11 @@ import { signingKey } from "../../constants";
 import { waxPeerBot } from "../../bot/waxpeer";
 import { priceEmpireBot } from "@/bot/priceempire";
 import { updateFloatBot } from "@/bot/updatefloat";
+import cronSchedule from "@/bot/cron";
+
+const updateFloatjob = cronSchedule(updateFloatBot, "* */23 * * *");
+const priceEmpireBotJob = cronSchedule(priceEmpireBot);
+const waxPeerBotJob = cronSchedule(waxPeerBot);
 
 // GET /api/testbot
 export default async function handle(
@@ -11,9 +16,9 @@ export default async function handle(
 ) {
   try {
     if (req.method === "GET") {
-      updateFloatBot();
-      waxPeerBot();
-      priceEmpireBot();
+      updateFloatjob.start();
+      priceEmpireBotJob.start();
+      waxPeerBotJob.start();
       return res.status(200).json({ status: true });
     }
   } catch (e: any) {

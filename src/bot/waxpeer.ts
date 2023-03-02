@@ -7,6 +7,7 @@ import { WaxPeerSearchItemResult, UpdatedItemsType, ItemInDb } from "../types";
 dayjs.extend(relativeTime);
 
 export async function waxPeerBot() {
+  console.log("waxpeer bot running");
   try {
     const botLastRun = await prisma.user.findUnique({
       where: {

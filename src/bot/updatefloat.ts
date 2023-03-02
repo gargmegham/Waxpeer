@@ -7,6 +7,7 @@ import { ItemInDb, PrimsaUpdateArgumnt } from "../types";
 dayjs.extend(relativeTime);
 
 export async function updateFloatBot() {
+  console.log("update float bot running");
   try {
     const botLastRun = await prisma.user.findUnique({
       where: {
@@ -20,13 +21,13 @@ export async function updateFloatBot() {
     });
     if (settings?.paused) return;
 
-    if (
-      dayjs(new Date()).diff(
-        new Date(botLastRun?.botLastRun || new Date()),
-        "hour"
-      ) < 24
-    )
-      return;
+    // if (
+    //   dayjs(new Date()).diff(
+    //     new Date(botLastRun?.botLastRun || new Date()),
+    //     "hour"
+    //   ) < 24
+    // )
+    //   return;
 
     const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
     let updateItems: Array<PrimsaUpdateArgumnt> = [];

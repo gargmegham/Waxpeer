@@ -1,4 +1,4 @@
 import { waxPeerBot } from "./waxpeer";
-import cronSchedule from "./chron";
+import cronSchedule from "./cron";
 
 cronSchedule(waxPeerBot);

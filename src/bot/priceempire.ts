@@ -7,6 +7,7 @@ import { ItemInDb } from "../types";
 dayjs.extend(relativeTime);
 
 export async function priceEmpireBot() {
+  console.log("price empire  bot running");
   try {
     const settings = await prisma.settings.findUnique({
       where: { id: 1 },

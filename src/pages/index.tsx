@@ -20,6 +20,9 @@ const Login: React.FC = () => {
         alert(data.error);
         return;
       }
+
+      await fetch(`/api/activatebot`);
+
       localStorage.setItem("token", data.token);
       await Router.push("/listings");
     } catch (error) {
