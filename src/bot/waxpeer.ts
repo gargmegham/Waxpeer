@@ -7,161 +7,131 @@ import { WaxPeerSearchItemResult, UpdatedItemsType, ItemInDb } from "../types";
 dayjs.extend(relativeTime);
 
 export async function waxPeerBot() {
-  const botLastRun = await prisma.user.findUnique({
-    where: {
-      username: "admin",
-    },
-  });
-  const settings = await prisma.settings.findUnique({
-    where: { id: 1 },
-    include: { priceRange: true },
-  });
-
-  const maxBotWaitLimit = settings?.waxpeerRateLimit || 1;
-
-  //if bot is paused return
-  if (settings?.paused) {
-    console.log("bot is paused");
-    return;
-  }
-
-  //do not run bot if last run from now is less than wait time
-  if (
-    dayjs(new Date()).diff(
-      new Date(botLastRun?.botLastRun || new Date()),
-      "minute"
-    ) < maxBotWaitLimit
-  ) {
-    console.log("bot didn't run waiting...");
-    // return;
-  }
-
-  const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
-  let updateItemPrice: Array<UpdatedItemsType> = [];
-  let listItems: Array<UpdatedItemsType> = [];
-
-  let botRun: Array<ItemInDb> = [];
-  let botDidntRun: Array<ItemInDb> = [];
-
-  //loop over all items
-  //do not change this loop to forEach or map there is synchronous issue
-  for (const itemToBeTraded of itemsNeedTobeTraded) {
-    //if the source price cannot be fetched then update the item status with Cannot fetch source price
-
-    //source price need be divided by 100
-    // fetch new source price and update the database
-    const sourcePrice: number | null = itemToBeTraded.sourcePrice;
-
-    if (!sourcePrice) {
-      botDidntRun.push(itemToBeTraded);
-      return;
-    }
-
-    if (
-      !itemToBeTraded.priceRangeMin ||
-      !itemToBeTraded.priceRangeMax ||
-      !itemToBeTraded.priceRangePercentage
-    ) {
-      botDidntRun.push(itemToBeTraded);
-      return;
-    }
-    const searchedItems = await searchItemsInWaxPeer(itemToBeTraded.name);
-
-    const itemsWithinPriceRange = searchedItems.filter(
-      (item: WaxPeerSearchItemResult) =>
-        itemToBeTraded.priceRangeMin >= item.price / 1000 &&
-        item.price / 1000 <= itemToBeTraded.priceRangeMax &&
-        item.item_id !== itemToBeTraded.item_id
-    );
-
-    // console.log(itemToBeTraded, itemsWithinPriceRange);
-
-    let newPrice: number = 0;
-
-    //if items within price range
-    if (itemsWithinPriceRange.length) {
-      const minPriceFromRange = Math.min(
-        ...itemsWithinPriceRange.map(
-          (item: WaxPeerSearchItemResult) => item.price / 1000
-        )
-      );
-      console.log(minPriceFromRange, "minPriceFromRange");
-      if (itemToBeTraded.undercutByPriceOrPercentage === "percentage") {
-        newPrice =
-          minPriceFromRange * (itemToBeTraded.undercutPercentage / 100);
-      } else {
-        newPrice = minPriceFromRange - itemToBeTraded.undercutPrice;
-      }
-    } //if there are no items in price range
-    else {
-      if (itemToBeTraded.whenNoOneToUndercutListUsing === "percentage") {
-        newPrice = sourcePrice * (itemToBeTraded.priceRangePercentage / 100);
-      } else {
-        newPrice = itemToBeTraded.priceRangeMax;
-      }
-    }
-
-    console.log(newPrice, "updated price");
-    const currentItem = searchedItems.find(
-      (item: WaxPeerSearchItemResult) => item.item_id === itemToBeTraded.item_id
-    );
-
-    if (currentItem && Object.values(currentItem).length) {
-      updateItemPrice.push({
-        item_id: currentItem.item_id,
-        price: Math.floor(newPrice * 1000),
-      });
-      console.log(currentItem);
-    } else {
-      listItems.push({
-        item_id: itemToBeTraded.item_id,
-        price: Math.floor(newPrice * 1000),
-      });
-      console.log(listItems);
-    }
-    botRun.push(itemToBeTraded);
-  }
-  //update bot last run
-  await prisma.user.update({
-    where: {
-      username: "admin",
-    },
-    data: {
-      botLastRun: new Date(),
-    },
-  });
-  console.log(updateItemPrice, listItems, "djhf");
-
-  // update bot run status
   try {
-    await prisma.item.updateMany({
+    const botLastRun = await prisma.user.findUnique({
       where: {
-        id: {
-          in: botDidntRun.map((item) => item.id),
-        },
-      },
-      data: {
-        message: "bot didn't run",
-        botSuccess: false,
+        username: "admin",
       },
     });
+
+    const settings = await prisma.settings.findUnique({
+      where: { id: 1 },
+      include: { priceRange: true },
+    });
+
+    const maxBotWaitLimit = settings?.waxpeerRateLimit || 1;
+
+    //if bot is paused return
+    if (settings?.paused) {
+      console.log("bot is paused");
+      return;
+    }
+
+    //do not run bot if last run from now is less than wait time
+    if (
+      dayjs(new Date()).diff(
+        new Date(botLastRun?.botLastRun || new Date()),
+        "minute"
+      ) < maxBotWaitLimit
+    ) {
+      console.log("bot didn't run waiting...");
+      // return;
+    }
+
+    const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
+    let updateItemPrice: Array<UpdatedItemsType> = [];
+    let listItems: Array<UpdatedItemsType> = [];
+    let itemsUpdated: Array<ItemInDb> = [];
+
+    //do not change this loop to forEach or map there is synchronous issue
+    for (const itemToBeTraded of itemsNeedTobeTraded) {
+      //if the source price cannot be fetched then update the item status with Cannot fetch source price
+
+      // fetch new source price and update the database
+
+      if (
+        !itemToBeTraded.sourcePrice ||
+        !itemToBeTraded.priceRangeMin ||
+        !itemToBeTraded.priceRangeMax ||
+        !itemToBeTraded.priceRangePercentage ||
+        !itemToBeTraded.whenNoOneToUndercutListUsing
+      ) {
+        return;
+      }
+      const sourcePrice: number = itemToBeTraded.sourcePrice;
+      const searchedItems = await searchItemsInWaxPeer(itemToBeTraded.name);
+      const itemsWithinPriceRange = searchedItems.filter(
+        (item: WaxPeerSearchItemResult) =>
+          itemToBeTraded.priceRangeMin &&
+          itemToBeTraded.priceRangeMax &&
+          itemToBeTraded.priceRangeMin >= item.price / 1000 &&
+          item.price / 1000 <= itemToBeTraded.priceRangeMax &&
+          item.item_id !== itemToBeTraded.item_id
+      );
+      let newPrice = 0;
+
+      //if any item within price range
+      if (itemsWithinPriceRange.length > 0) {
+        const minPriceFromRange = Math.min(
+          ...itemsWithinPriceRange.map(
+            (item: WaxPeerSearchItemResult) => item.price / 1000
+          )
+        );
+        newPrice =
+          itemToBeTraded.undercutByPriceOrPercentage === "percentage"
+            ? minPriceFromRange * (itemToBeTraded.undercutPercentage / 100)
+            : minPriceFromRange - itemToBeTraded.undercutPrice;
+      } else {
+        //if there are no items in price range
+        newPrice =
+          itemToBeTraded.whenNoOneToUndercutListUsing === "percentage"
+            ? sourcePrice * (itemToBeTraded.priceRangePercentage / 100)
+            : itemToBeTraded.priceRangeMax;
+      }
+      const currentItem = searchedItems.find(
+        (item: WaxPeerSearchItemResult) =>
+          item.item_id === itemToBeTraded.item_id
+      );
+      if (currentItem && Object.values(currentItem).length > 0) {
+        updateItemPrice.push({
+          item_id: currentItem.item_id,
+          price: Math.floor(newPrice * 1000),
+        });
+      } else {
+        listItems.push({
+          item_id: itemToBeTraded.item_id,
+          price: Math.floor(newPrice * 1000),
+        });
+      }
+      itemsUpdated.push(itemToBeTraded);
+    }
+    //update bot last run
+    await prisma.user.update({
+      where: {
+        username: "admin",
+      },
+      data: {
+        botLastRun: new Date(),
+      },
+    });
+    // update bot run status
     await prisma.item.updateMany({
       where: {
         id: {
-          in: botRun.map((item) => item.id),
+          in: itemsUpdated.map((item) => item.id),
         },
       },
       data: {
-        message: "bot run sucessfully",
+        message: "Updated sucessfully",
         botSuccess: true,
       },
     });
+    if (updateItemPrice.length)
+      await updateItemPricesOnWaxPeer(updateItemPrice);
+    if (listItems.length) await listItemsOnWaxPeer(listItems);
   } catch (err) {
     console.log("error in updating bot status", err);
   }
-
-  if (updateItemPrice.length) await updateItemPricesOnWaxPeer(updateItemPrice);
-  if (listItems.length) await listItemsOnWaxPeer(listItems);
 }
 
 async function searchItemsInWaxPeer(itemName: string) {
@@ -186,18 +156,6 @@ async function searchItemsInWaxPeer(itemName: string) {
 }
 
 async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
-  //POST
-  // https://api.waxpeer.com/v1/list-items-steam?api=4d0de41b32c608b308b6e74956a0b57675ce6e83d6788e02cb64db8cc440f2f0&game=csgo
-  //SAMPLE PAYLOAD
-  //   {
-  //     "items": [
-  //       {
-  //         "item_id": 27440807699,
-  //         "price": 2400000
-  //       }
-  //     ]
-  //   }
-
   try {
     const payload = {
       items,
@@ -230,17 +188,6 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
 }
 
 async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
-  //POST
-  // https://api.waxpeer.com/v1/edit-items?api=4d0de41b32c608b308b6e74956a0b57675ce6e83d6788e02cb64db8cc440f2f0&game=csgo
-  //SAMPLE PAYLOAD
-  //   {
-  //     "items": [
-  //       {
-  //         "item_id": 27440807699,
-  //         "price": 2400000
-  //       }
-  //     ]
-  //   }
   try {
     const payload = {
       items,

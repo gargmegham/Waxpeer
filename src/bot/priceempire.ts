@@ -2,118 +2,120 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import prisma from "../lib/prisma";
-import {
-  WaxPeerSearchItemResult,
-  UpdatedItemsType,
-  ItemInDb,
-  PrimsaUpdateArgumnt,
-} from "../types";
-import mockedResponse from "../mockedResponse";
+import { ItemInDb } from "../types";
 
 dayjs.extend(relativeTime);
 
 export async function priceEmpireBot() {
-  console.log("inside price empire bot");
-  const botLastRun = await prisma.user.findUnique({
-    where: {
-      username: "admin",
-    },
-  });
-  const settings = await prisma.settings.findUnique({
-    where: { id: 1 },
-    include: { priceRange: true },
-  });
-
-  if (!settings || !Object.values(settings).length) return;
-
-  const maxBotWaitLimit = settings?.priceEmpireRateLimit || 1;
-
-  //if bot is paused return
-  if (settings?.paused) {
-    console.log("price empire bot is paused");
-    return;
-  }
-
-  //do not run bot if last run from now is less than wait time
-  if (
-    dayjs(new Date()).diff(
-      new Date(botLastRun?.priceEmpireLastRun || new Date()),
-      "minute"
-    ) < maxBotWaitLimit
-  ) {
-    console.log("price empire bot didn't run waiting...");
-    // return;
-  }
-
-  const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
-
-  // const latestSourcePrices = await getAllItemPrices(settings.source || "buff");
-  //replace this with the commented line above on server
-  const latestSourcePrices = mockedResponse;
-
-  const updatePromises: Array<PrimsaUpdateArgumnt> = [];
-
-  //loop over all items
-  itemsNeedTobeTraded.map(async (itemToBeTraded: ItemInDb) => {
-    //if the source price cannot be fetched then update the item status with Cannot fetch source price
-    if (
-      !(
-        latestSourcePrices[itemToBeTraded.name] &&
-        latestSourcePrices[itemToBeTraded.name][settings.source] &&
-        latestSourcePrices[itemToBeTraded.name][settings.source].price
-      )
-    ) {
+  try {
+    const settings = await prisma.settings.findUnique({
+      where: { id: 1 },
+      include: { priceRange: true },
+    });
+    if (!settings || !Object.values(settings).length) return;
+    if (settings?.paused) {
       return;
     }
 
-    //source price need be divided by 100
-    // fetch new source price and update the database
-    const sourcePrice: number =
-      latestSourcePrices[itemToBeTraded.name][settings.source].price;
-
-    let rangeMin: number | null = null;
-    let rangeMax: number | null = null;
-    let whenNoOneToUndercutListUsing = "percentage";
-    let priceRangePercentage: number = 0;
-
-    settings.priceRange.map((priceRange) => {
-      if (
-        priceRange.sourcePriceMin >= sourcePrice &&
-        itemToBeTraded.currentPrice <= priceRange.sourcePriceMax
-      ) {
-        console.log(priceRange);
-        rangeMin = sourcePrice * (priceRange.priceRangeMin / 100);
-        rangeMax = sourcePrice * (priceRange.priceRangeMax / 100);
-        whenNoOneToUndercutListUsing = priceRange.whenNoOneToUndercutListUsing;
-        priceRangePercentage = priceRange.priceRangePercentage;
-      }
+    const maxBotWaitLimit = settings?.priceEmpireRateLimit || 1;
+    const botLastRun = await prisma.user.findUnique({
+      where: {
+        username: "admin",
+      },
     });
-
-    console.log(rangeMax, rangeMin, sourcePrice);
-
-    if (rangeMax && rangeMax) {
-      const update = {
-        where: {
-          id: itemToBeTraded.id,
-        },
-        data: {
-          sourcePrice: sourcePrice / 100,
-          whenNoOneToUndercutListUsing,
-          priceRangePercentage,
-          undercutPrice: settings.undercutPrice,
-          undercutPercentage: settings.undercutPercentage,
-          undercutByPriceOrPercentage: settings.undercutByPriceOrPercentage,
-          priceRangeMin: rangeMin,
-          priceRangeMax: rangeMax,
-        },
-      };
-      updatePromises.push(update);
+    if (
+      dayjs(new Date()).diff(
+        new Date(botLastRun?.priceEmpireLastRun || new Date()),
+        "minute"
+      ) < maxBotWaitLimit
+    ) {
+      return;
     }
-  });
+    const itemsTobeUpdated: Array<ItemInDb> = await prisma.item.findMany();
+    const latestSourcePrices = await getAllItemPrices(
+      settings.source || "buff"
+    );
+    const updateBatch = [];
+    itemsTobeUpdated.map((itemToBeTraded: ItemInDb) => {
+      //if the source price cannot be fetched then update the item status with Cannot fetch source price
+      if (
+        !latestSourcePrices[itemToBeTraded.name] ||
+        !latestSourcePrices[itemToBeTraded.name][settings.source] ||
+        !latestSourcePrices[itemToBeTraded.name][settings.source].price ||
+        Number.isNaN(
+          Number(latestSourcePrices[itemToBeTraded.name][settings.source].price)
+        )
+      ) {
+        updateBatch.push(
+          prisma.item.update({
+            where: {
+              id: itemToBeTraded.id,
+            },
+            data: {
+              botSuccess: false,
+              message: "Cannot fetch source price",
+            },
+          })
+        );
+        return;
+      }
 
-  try {
-    await prisma.$transaction([
-      ...updatePromises.map((item) => prisma.item.update(item)),
+      const sourcePrice: number =
+        latestSourcePrices[itemToBeTraded.name][settings.source].price / 100;
+      let priceRangeMin: number = 0,
+        priceRangeMax: number = 0,
+        priceRangePercentage: number = 0,
+        whenNoOneToUndercutListUsing = "percentage";
+
+      let foundAtLeastOnePriceRange = false;
+      settings.priceRange.map((priceRange) => {
+        if (
+          !foundAtLeastOnePriceRange &&
+          priceRange.sourcePriceMin <= sourcePrice &&
+          priceRange.sourcePriceMax > sourcePrice
+        ) {
+          priceRangeMin = sourcePrice * (priceRange.priceRangeMin / 100);
+          priceRangeMax = sourcePrice * (priceRange.priceRangeMax / 100);
+          priceRangePercentage = priceRange.priceRangePercentage;
+          whenNoOneToUndercutListUsing =
+            priceRange.whenNoOneToUndercutListUsing;
+          foundAtLeastOnePriceRange = true;
+          return;
+        }
+      });
+      if (!foundAtLeastOnePriceRange) {
+        updateBatch.push(
+          prisma.item.update({
+            where: {
+              id: itemToBeTraded.id,
+            },
+            data: {
+              botSuccess: false,
+              message: "Cannot find price range for this item",
+            },
+          })
+        );
+        return;
+      } else
+        updateBatch.push(
+          prisma.item.update({
+            where: {
+              id: itemToBeTraded.id,
+            },
+            data: {
+              sourcePrice: sourcePrice / 100,
+              whenNoOneToUndercutListUsing,
+              priceRangePercentage,
+              undercutPrice: settings.undercutPrice,
+              undercutPercentage: settings.undercutPercentage,
+              undercutByPriceOrPercentage: settings.undercutByPriceOrPercentage,
+              priceRangeMin,
+              priceRangeMax,
+            },
+          })
+        );
+    });
+    updateBatch.push(
       prisma.user.update({
         where: {
           username: "admin",
@@ -121,10 +123,11 @@ export async function priceEmpireBot() {
         data: {
           priceEmpireLastRun: new Date(),
         },
-      }),
-    ]);
+      })
+    );
+    await prisma.$transaction(updateBatch);
   } catch (err) {
-    console.log("error in update priceempire", err);
+    console.log("error during updating from priceempire", err);
   }
 }
 
@@ -149,6 +152,6 @@ async function getAllItemPrices(source: string) {
     const { items } = await response.json();
     return items;
   } catch (err) {
-    console.log("getting prices error", err);
+    console.log("getting error from priceempire API", err);
   }
 }
