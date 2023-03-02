@@ -1,4 +1,4 @@
 import { priceEmpireBot } from "./priceempire";
-import cronSchedule from "./chron";
+import cronSchedule from "./cron";
 
 cronSchedule(priceEmpireBot);
