@@ -31,15 +31,18 @@ export type ItemInDb = {
   name: string;
   type: string;
   source: string;
-  sourcePrice: number;
+  sourcePrice: number | null;
   lastUpdated: Date;
   undercutPrice: number;
   undercutPercentage: number;
   undercutByPriceOrPercentage: string;
-  priceRangeMin: number;
-  priceRangeMax: number;
-  priceRangePercentage: number;
-  whenNoOneToUndercutListUsing: string;
+  priceRangeMin: number | null;
+  priceRangeMax: number | null;
+  priceRangePercentage: number | null;
+  whenNoOneToUndercutListUsing: string | null;
+  botSuccess: boolean;
+  message: string;
+  floatCondition: number | null;
 };
 
 export type Item = {

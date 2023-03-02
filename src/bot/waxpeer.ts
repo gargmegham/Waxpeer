@@ -42,50 +42,30 @@ export async function waxPeerBot() {
   let updateItemPrice: Array<UpdatedItemsType> = [];
   let listItems: Array<UpdatedItemsType> = [];
 
-  const { items } = mockedResponse;
-
-  //   const items = await getAllItemPrices(itemsNeedTobeTraded[0].source || "buff");
-  //replace this with the commented line above on server
-  const latestSourcePrices = items;
+  let botRun: Array<ItemInDb> = [];
+  let botDidntRun: Array<ItemInDb> = [];
 
   //loop over all items
   itemsNeedTobeTraded.map(async (itemToBeTraded: ItemInDb) => {
     //if the source price cannot be fetched then update the item status with Cannot fetch source price
-    if (
-      !(
-        latestSourcePrices[itemToBeTraded.name] &&
-        latestSourcePrices[itemToBeTraded.name]?.item &&
-        latestSourcePrices[itemToBeTraded.name]?.item.prices[
-          itemToBeTraded.source
-        ] &&
-        latestSourcePrices[itemToBeTraded.name]?.item.prices[
-          itemToBeTraded.source
-        ]?.sourcePrice
-      )
-    ) {
-      try {
-        await prisma.item.update({
-          where: {
-            id: itemToBeTraded.id,
-          },
-          data: {
-            message: "Cannot fetch source price",
-            botSuccess: false,
-          },
-        });
-        console.log("Cannot fetch source price");
-      } catch (err) {
-        console.log("error in updating bot status", err);
-      }
-      return;
-    }
 
     //source price need be divided by 100
     // fetch new source price and update the database
-    const sourcePrice: number =
-      latestSourcePrices[itemToBeTraded.name]?.item.prices[
-        itemToBeTraded.source
-      ].sourcePrice;
+    const sourcePrice: number | null = itemToBeTraded.sourcePrice;
+
+    if (!sourcePrice) {
+      botDidntRun.push(itemToBeTraded);
+      return;
+    }
+
+    if (
+      !itemToBeTraded.priceRangeMin ||
+      !itemToBeTraded.priceRangeMax ||
+      !itemToBeTraded.priceRangePercentage
+    ) {
+      botDidntRun.push(itemToBeTraded);
+      return;
+    }
 
     const minRange: number =
       (itemToBeTraded.priceRangeMin / 100) * (sourcePrice / 100);
@@ -139,6 +119,7 @@ export async function waxPeerBot() {
     } else {
       listItems.push({ ...currentItem, newPrice });
     }
+    botRun.push(itemToBeTraded);
   });
   await prisma.user.update({
     where: {
@@ -149,6 +130,34 @@ export async function waxPeerBot() {
     },
   });
   console.log(updateItemPrice, listItems, "djhf");
+
+  try {
+    await prisma.item.updateMany({
+      where: {
+        id: {
+          in: botDidntRun.map((item) => item.id),
+        },
+      },
+      data: {
+        message: "bot didn't run",
+        botSuccess: false,
+      },
+    });
+    await prisma.item.updateMany({
+      where: {
+        id: {
+          in: botRun.map((item) => item.id),
+        },
+      },
+      data: {
+        message: "bot run sucessfully",
+        botSuccess: true,
+      },
+    });
+  } catch (err) {
+    console.log("error in updating bot status", err);
+  }
+
   return;
   updateItemPricesOnWaxPeer(updateItemPrice);
   listItemsOnWaxPeer(listItems);
