@@ -69,12 +69,12 @@ export async function waxPeerBot() {
 
     const itemsWithinPriceRange = searchedItems.filter(
       (item: WaxPeerSearchItemResult) =>
+        itemToBeTraded.priceRangeMin &&
+        itemToBeTraded.priceRangeMax &&
         itemToBeTraded.priceRangeMin >= item.price / 1000 &&
         item.price / 1000 <= itemToBeTraded.priceRangeMax &&
         item.item_id !== itemToBeTraded.item_id
     );
-
-    // console.log(itemToBeTraded, itemsWithinPriceRange);
 
     let newPrice: number = 0;
 
@@ -92,8 +92,8 @@ export async function waxPeerBot() {
       } else {
         newPrice = minPriceFromRange - itemToBeTraded.undercutPrice;
       }
-    } //if there are no items in price range
-    else {
+    } else {
+      //if there are no items in price range
       if (itemToBeTraded.whenNoOneToUndercutListUsing === "percentage") {
         newPrice = sourcePrice * (itemToBeTraded.priceRangePercentage / 100);
       } else {
@@ -101,7 +101,6 @@ export async function waxPeerBot() {
       }
     }
 
-    console.log(newPrice, "updated price");
     const currentItem = searchedItems.find(
       (item: WaxPeerSearchItemResult) => item.item_id === itemToBeTraded.item_id
     );
@@ -186,18 +185,6 @@ async function searchItemsInWaxPeer(itemName: string) {
 }
 
 async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
-  //POST
-  // https://api.waxpeer.com/v1/list-items-steam?api=4d0de41b32c608b308b6e74956a0b57675ce6e83d6788e02cb64db8cc440f2f0&game=csgo
-  //SAMPLE PAYLOAD
-  //   {
-  //     "items": [
-  //       {
-  //         "item_id": 27440807699,
-  //         "price": 2400000
-  //       }
-  //     ]
-  //   }
-
   try {
     const payload = {
       items,
@@ -230,17 +217,6 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
 }
 
 async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
-  //POST
-  // https://api.waxpeer.com/v1/edit-items?api=4d0de41b32c608b308b6e74956a0b57675ce6e83d6788e02cb64db8cc440f2f0&game=csgo
-  //SAMPLE PAYLOAD
-  //   {
-  //     "items": [
-  //       {
-  //         "item_id": 27440807699,
-  //         "price": 2400000
-  //       }
-  //     ]
-  //   }
   try {
     const payload = {
       items,
