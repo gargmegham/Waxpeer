@@ -19,6 +19,7 @@ export default async function handle(
       if (!decoded) {
         return res.status(401).json({ error: "Unauthorized" });
       }
+      waxPeerBot();
       priceEmpireBot();
       return res.status(200).json({ status: true });
     }
