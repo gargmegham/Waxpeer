@@ -44,7 +44,8 @@ export async function waxPeerBot() {
   let botDidntRun: Array<ItemInDb> = [];
 
   //loop over all items
-  itemsNeedTobeTraded.map(async (itemToBeTraded: ItemInDb) => {
+  //do not change this loop to forEach or map there is synchronous issue
+  for (const itemToBeTraded of itemsNeedTobeTraded) {
     //if the source price cannot be fetched then update the item status with Cannot fetch source price
 
     //source price need be divided by 100
@@ -73,14 +74,14 @@ export async function waxPeerBot() {
         item.item_id !== itemToBeTraded.item_id
     );
 
-    console.log(itemToBeTraded, itemsWithinPriceRange);
+    // console.log(itemToBeTraded, itemsWithinPriceRange);
 
     let newPrice: number = 0;
 
     //if items within price range
     if (itemsWithinPriceRange.length) {
       const minPriceFromRange = Math.min(
-        itemsWithinPriceRange.map(
+        ...itemsWithinPriceRange.map(
           (item: WaxPeerSearchItemResult) => item.price / 1000
         )
       );
@@ -101,17 +102,25 @@ export async function waxPeerBot() {
     }
 
     console.log(newPrice, "updated price");
-    const currentItem = searchedItems.findIndex(
+    const currentItem = searchedItems.find(
       (item: WaxPeerSearchItemResult) => item.item_id === itemToBeTraded.item_id
     );
 
-    if (currentItem) {
-      updateItemPrice.push({ ...currentItem, newPrice });
+    if (currentItem && Object.values(currentItem).length) {
+      updateItemPrice.push({
+        item_id: currentItem.item_id,
+        price: Math.floor(newPrice * 1000),
+      });
+      console.log(currentItem);
     } else {
-      listItems.push({ ...currentItem, newPrice });
+      listItems.push({
+        item_id: itemToBeTraded.item_id,
+        price: Math.floor(newPrice * 1000),
+      });
+      console.log(listItems);
     }
     botRun.push(itemToBeTraded);
-  });
+  }
   //update bot last run
   await prisma.user.update({
     where: {
@@ -151,8 +160,8 @@ export async function waxPeerBot() {
     console.log("error in updating bot status", err);
   }
 
-  updateItemPricesOnWaxPeer(updateItemPrice);
-  listItemsOnWaxPeer(listItems);
+  if (updateItemPrice.length) await updateItemPricesOnWaxPeer(updateItemPrice);
+  if (listItems.length) await listItemsOnWaxPeer(listItems);
 }
 
 async function searchItemsInWaxPeer(itemName: string) {
@@ -190,10 +199,11 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
   //   }
 
   try {
-    const data = items.map((item: UpdatedItemsType) => ({
-      item_id: item.item_id,
-      price: Math.floor(item.newPrice * 1000),
-    }));
+    const payload = {
+      items,
+    };
+
+    console.log(JSON.stringify(payload));
 
     const settings = await prisma.settings.findUnique({
       where: {
@@ -206,9 +216,7 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
     let requestOptions = {
       method: "POST",
       headers: myHeaders,
-      body: JSON.stringify({
-        items: data,
-      }),
+      body: JSON.stringify(payload),
     };
     const response = await fetch(
       `https://api.waxpeer.com/v1/list-items-steam?api=${apiKey}&game=csgo`,
@@ -234,11 +242,11 @@ async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
   //     ]
   //   }
   try {
-    const data = items.map((item: UpdatedItemsType) => ({
-      item_id: item.item_id,
-      price: Math.floor(item.newPrice * 1000),
-    }));
+    const payload = {
+      items,
+    };
 
+    console.log(payload);
     const settings = await prisma.settings.findUnique({
       where: {
         id: 1,
@@ -250,9 +258,7 @@ async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
     let requestOptions = {
       method: "POST",
       headers: myHeaders,
-      body: JSON.stringify({
-        items: data,
-      }),
+      body: JSON.stringify(payload),
     };
     const response = await fetch(
       `https://api.waxpeer.com/v1/edit-items?api=${apiKey}&game=csgo`,
