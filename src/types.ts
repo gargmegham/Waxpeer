@@ -88,6 +88,7 @@ export type WaxPeerSearchItemResult = {
 };
 
 export interface UpdatedItemsType {
+  id: number;
   item_id: string;
   price: number;
 }

@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { signingKey } from "../../constants";
 import { waxPeerBot } from "../../bot/waxpeer";
 import { priceEmpireBot } from "@/bot/priceempire";
+import { updateFloatBot } from "@/bot/updatefloat";
 
 // GET /api/testbot
 export default async function handle(
@@ -19,6 +20,7 @@ export default async function handle(
       if (!decoded) {
         return res.status(401).json({ error: "Unauthorized" });
       }
+      updateFloatBot();
       waxPeerBot();
       priceEmpireBot();
       return res.status(200).json({ status: true });
