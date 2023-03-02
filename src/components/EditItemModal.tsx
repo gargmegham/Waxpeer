@@ -110,44 +110,6 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
             <Row gutter={[32, 32]}>
               <Col span={8}>
                 <Form.Item
-                  label="Source"
-                  name="source"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select a source",
-                    },
-                  ]}
-                >
-                  <Select
-                    defaultValue={inputs.source}
-                    style={{ width: 230 }}
-                    options={Object.keys(inputs.prices)
-                      .filter((key) => inputs.prices[key].sourcePrice !== null)
-                      .map((key) => {
-                        return {
-                          value: key,
-                          label: `${`$ ${
-                            inputs.prices[key].sourcePrice / 100
-                          }`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} (${key})`,
-                        };
-                      })}
-                    onChange={(e) => {
-                      setInputs({
-                        ...inputs,
-                        source: e,
-                        sourcePrice: inputs.prices[e].sourcePrice / 100,
-                      });
-                    }}
-                  >
-                    Source
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={[32, 32]}>
-              <Col span={8}>
-                <Form.Item
                   label="Undercut Price"
                   name="undercutPrice"
                   rules={[
@@ -164,8 +126,6 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                     formatter={(value) =>
                       `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     }
-                    // @ts-ignore
-                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                     onChange={(e) => {
                       inputs.undercutPrice = Number(e);
                     }}
@@ -188,8 +148,6 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                     size="large"
                     defaultValue={inputs.undercutPercentage}
                     formatter={(value) => `${value}%`}
-                    // @ts-ignore
-                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                     onChange={(e) => {
                       inputs.undercutPercentage = Number(e);
                     }}
@@ -248,8 +206,6 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                     formatter={(value) =>
                       `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     }
-                    // @ts-ignore
-                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                     onChange={(e) => {
                       inputs.priceRangeMin = Number(e);
                     }}
@@ -274,8 +230,6 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                     formatter={(value) =>
                       `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     }
-                    // @ts-ignore
-                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                     onChange={(e) => {
                       inputs.priceRangeMax = Number(e);
                     }}
@@ -296,8 +250,6 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                   <InputNumber
                     defaultValue={inputs.priceRangePercentage}
                     formatter={(value) => `${value}%`}
-                    // @ts-ignore
-                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                     onChange={(e) => {
                       inputs.priceRangePercentage = Number(e);
                     }}

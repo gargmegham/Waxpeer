@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { cronSchedule } from "../../bot/chron";
-import { waxPeerBot } from "../../bot/bot";
+import { waxPeerBot } from "../../bot/waxpeer";
 
 // GET /api/testbot
 export default async function handle(

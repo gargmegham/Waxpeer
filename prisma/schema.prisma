@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
+  id Int @id @default(autoincrement())
   email String  @unique
   name  String?
   password String?
@@ -20,21 +20,27 @@ model Settings {
   id Int @id @default(autoincrement())
   userId Int
   waxpeerApiKey String?
-  waxpeerRateLimit Int?
+  waxpeerRateLimit Int @default(1)
   priceEmpireApiKey String?
-  PriceEmpireRateLimit Int?
+  priceEmpireRateLimit Int @default(1)
+  source String @default("buff")
+  undercutPrice Float @default(0.1)
+  undercutPercentage Float @default(1)
+  undercutByPriceOrPercentage String @default("price")
   paused Boolean @default(false)
   priceRange PriceRange[]
 }
 
 model PriceRange{
   id Int @id @default(autoincrement())
-  settings           Settings             @relation(fields: [settingsId], references: [id])
-  settingsId         Int
-  SourcePriceMin Float?
-  SourcePriceMax Float?
+  settings Settings @relation(fields: [settingsId], references: [id])
+  settingsId Int
+  sourcePriceMin Float
+  sourcePriceMax Float
   priceRangeMin Float
   priceRangeMax Float
+  priceRangePercentage Float
+  whenNoOneToUndercutListUsing String
 }
 
 model Item {
@@ -44,15 +50,17 @@ model Item {
   active Boolean @default(true)
   item_id String
   source String
-  sourcePrice Float
-  lastUpdated DateTime
+  sourcePrice Float?
+  lastUpdated DateTime @default(now())
   undercutPrice Float
   undercutPercentage Float
-  currentPrice Float
+  currentPrice Float @default(0)
   undercutByPriceOrPercentage String
-  priceRangeMin Float
-  priceRangeMax Float
-  priceRangePercentage Float
-  whenNoOneToUndercutListUsing String
-  botRunStatus String?
+  priceRangeMin Float?
+  priceRangeMax Float?
+  priceRangePercentage Float?
+  whenNoOneToUndercutListUsing String?
+  botSuccess Boolean @default(false)
+  message String @default("Not started yet")
+  floatCondition Float?
 }

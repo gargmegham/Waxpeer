@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { signingKey } from "../../constants";
 import prisma from "../../lib/prisma";
-import { SelectedItem } from "../../types";
+import { Item } from "../../types";
 
 // POST /api/priceempire
 export default async function handle(
@@ -21,31 +21,32 @@ export default async function handle(
         return res.status(401).json({ error: "Unauthorized" });
       }
       // fetch data from priceempire
-      const items: Array<SelectedItem> = req.body.items;
+      const items: Array<Item> = req.body.items;
+      const settings = await prisma.settings.findUnique({
+        where: { id: 1 },
+        include: { priceRange: true },
+      });
+      if (!settings) {
+        return res.status(404).json({ error: "Settings not found." });
+      }
       // create items in prisma model
-      const response: any = {};
+      const batchItems = [];
       for (const item of items) {
-        const newItem = await prisma.item.create({
+        const newItem = prisma.item.create({
           data: {
             name: item.name,
             type: item.type,
             item_id: String(item.item_id),
-            source: item.source,
-            sourcePrice: item.sourcePrice,
-            currentPrice: 0,
-            lastUpdated: item.lastUpdated,
-            undercutPrice: item.undercutPrice,
-            undercutPercentage: item.undercutPercentage,
-            undercutByPriceOrPercentage: item.undercutByPriceOrPercentage,
-            priceRangeMin: item.priceRangeMin,
-            priceRangeMax: item.priceRangeMax,
-            priceRangePercentage: item.priceRangePercentage,
-            whenNoOneToUndercutListUsing: item.whenNoOneToUndercutListUsing,
+            source: settings.source,
+            undercutPrice: settings.undercutPrice,
+            undercutPercentage: settings.undercutPercentage,
+            undercutByPriceOrPercentage: settings.undercutByPriceOrPercentage,
           },
         });
-        response[item.item_id] = newItem;
+        batchItems.push(newItem);
       }
-      return res.status(201).json(JSON.stringify(response));
+      await prisma.$transaction(batchItems);
+      return res.status(201).json(JSON.stringify({}));
     } else if (req.method === "PUT") {
       // verify bearer token
       const jwt = require("jsonwebtoken");
@@ -69,9 +70,6 @@ export default async function handle(
       const updatedItem = await prisma.item.update({
         where: { id: itemPrismaPk },
         data: {
-          source: item.source,
-          sourcePrice: item.sourcePrice,
-          lastUpdated: new Date(),
           undercutPrice: item.undercutPrice,
           undercutPercentage: item.undercutPercentage,
           undercutByPriceOrPercentage: item.undercutByPriceOrPercentage,
@@ -94,19 +92,42 @@ export default async function handle(
         return res.status(401).json({ error: "Unauthorized" });
       }
       // delete item from prisma model
-      const itemPk: any = req.body.id;
-      const item = await prisma.item.findUnique({
-        where: { id: itemPk },
-      });
-      if (!item) {
-        return res.status(404).json({ error: "Item not found." });
+      const itemPks: Array<number> = req.body.ids;
+      const deleteItemsBatch = [];
+      for (const itemPk of itemPks) {
+        if (typeof itemPk !== "number") {
+          return res.status(400).json({ error: "Invalid item id." });
+        }
+        const deleteItem = prisma.item.delete({
+          where: { id: itemPk },
+        });
+        deleteItemsBatch.push(deleteItem);
       }
-      const deletedItem = await prisma.item.delete({
-        where: { id: itemPk },
+      await prisma.$transaction(deleteItemsBatch);
+      // remove items from waxpeer
+      const settings = await prisma.settings.findUnique({
+        where: {
+          id: 1,
+        },
       });
-      return res.status(200).json({ deletedItem, message: "Item deleted." });
+      const apiKey: string = settings?.waxpeerApiKey || "";
+      if (apiKey) {
+        let myHeaders = new Headers();
+        myHeaders.append("accept", "application/json");
+        let requestOptions = {
+          method: "GET",
+          headers: myHeaders,
+        };
+        let url = `https://api.waxpeer.com/v1/remove-items?api=${apiKey}`;
+        for (const id of itemPks) {
+          url += `&id=${id}`;
+        }
+        await fetch(url, requestOptions);
+      }
+      return res.status(200).json({ message: "Item deleted." });
     }
   } catch (e: any) {
+    console.error(e);
     res.status(500).json({ error: e.message });
   }
 }

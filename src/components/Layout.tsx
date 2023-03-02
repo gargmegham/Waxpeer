@@ -10,14 +10,14 @@ const Layout: React.FC<any> = (props) => {
   React.useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/login");
+      router.push("/");
       return;
     }
     // check if jwt web token is expired
     const payload = JSON.parse(atob(token.split(".")[1]));
     if (payload.exp < Date.now() / 1000) {
       localStorage.removeItem("token");
-      router.push("/login");
+      router.push("/");
       return;
     }
   });
