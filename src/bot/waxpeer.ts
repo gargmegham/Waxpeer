@@ -26,12 +26,12 @@ export async function waxPeerBot() {
 
     //do not run bot if last run from now is less than wait time
     if (
-      dayjs(new Date()).diff(
-        new Date(botLastRun?.botLastRun || new Date()),
-        "minute"
-      ) < maxBotWaitLimit
+      botLastRun &&
+      botLastRun.botLastRun &&
+      dayjs(new Date()).diff(new Date(botLastRun.botLastRun), "minute") <
+        maxBotWaitLimit
     ) {
-      console.log("waxpeer bot is waiting...");
+      console.log("waxpeer bot waiting...");
       return;
     }
 
@@ -49,7 +49,7 @@ export async function waxPeerBot() {
         !itemToBeTraded.priceRangePercentage ||
         !itemToBeTraded.whenNoOneToUndercutListUsing
       ) {
-        console.log("itemToBeTraded has some data missing, skipping..", itemToBeTraded);
+        console.log("itemToBeTraded has some data missing, skipping..");
         return;
       }
       const sourcePrice: number = itemToBeTraded.sourcePrice;

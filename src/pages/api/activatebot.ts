@@ -21,7 +21,7 @@ export default async function handle(
         });
         taskArray = [];
       }
-      priceEmpireBotJob.start();
+      // priceEmpireBotJob.start();
       waxPeerBotJob.start();
       taskArray.push(priceEmpireBotJob);
       taskArray.push(waxPeerBotJob);
