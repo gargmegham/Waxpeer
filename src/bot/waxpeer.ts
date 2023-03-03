@@ -50,7 +50,7 @@ export async function waxPeerBot() {
         !itemToBeTraded.whenNoOneToUndercutListUsing
       ) {
         console.log("itemToBeTraded has some data missing, skipping..");
-        return;
+        continue;
       }
       const sourcePrice: number = itemToBeTraded.sourcePrice;
       const searchedItems = await searchItemsInWaxPeer(itemToBeTraded.name);
