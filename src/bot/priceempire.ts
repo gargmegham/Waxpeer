@@ -159,10 +159,9 @@ async function getAllItemPrices(source: string) {
       method: "GET",
       headers: myHeaders,
     };
-    const response = await fetch(
-      `https://pricempire.com/api/v3/getAllItems?api_key=${apiKey}&sources=${source}'`,
-      requestOptions
-    );
+    const uri = `https://pricempire.com/api/v3/getAllItems?api_key=${apiKey}&sources=${source}`;
+    console.log("url::", uri)
+    const response = await fetch(uri, requestOptions);
     return await response.json();
   } catch (err) {
     console.log("getting error from priceempire API", err);
