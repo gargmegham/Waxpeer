@@ -3,6 +3,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 import prisma from "../lib/prisma";
 import { ItemInDb } from "../types";
+import mockedData from "../mockedResponse";
 
 dayjs.extend(relativeTime);
 
@@ -15,6 +16,7 @@ export async function priceEmpireBot() {
     });
     if (!settings || !Object.values(settings).length) return;
     if (settings?.paused) {
+      console.log("price empire bot paused");
       return;
     }
 
@@ -30,12 +32,14 @@ export async function priceEmpireBot() {
         "minute"
       ) < maxBotWaitLimit
     ) {
+      console.log("price empire bot waiting");
       return;
     }
     const itemsTobeUpdated: Array<ItemInDb> = await prisma.item.findMany();
-    const latestSourcePrices = await getAllItemPrices(
-      settings.source || "buff"
-    );
+    // const latestSourcePrices = await getAllItemPrices(
+    //   settings.source || "buff"
+    // );
+    const latestSourcePrices: any = mockedData;
     const updateBatch = [];
     itemsTobeUpdated.map((itemToBeTraded: ItemInDb) => {
       //if the source price cannot be fetched then update the item status with Cannot fetch source price
@@ -58,6 +62,7 @@ export async function priceEmpireBot() {
             },
           })
         );
+        console.log("cannot fetch source price");
         return;
       }
 
@@ -81,6 +86,7 @@ export async function priceEmpireBot() {
           whenNoOneToUndercutListUsing =
             priceRange.whenNoOneToUndercutListUsing;
           foundAtLeastOnePriceRange = true;
+          console.log("found price range");
           return;
         }
       });
@@ -96,6 +102,7 @@ export async function priceEmpireBot() {
             },
           })
         );
+        console.log("cannot find price range for this item");
         return;
       } else
         updateBatch.push(
@@ -127,6 +134,7 @@ export async function priceEmpireBot() {
       })
     );
     await prisma.$transaction(updateBatch);
+    console.log("price empire bot completed");
   } catch (err) {
     console.log("error during updating from priceempire", err);
   }
