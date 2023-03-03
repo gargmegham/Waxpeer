@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
-import prisma from "../lib/prisma";
-import { WaxPeerSearchItemResult, UpdatedItemsType, ItemInDb } from "../types";
+import prisma from "@/lib/prisma";
+import { WaxPeerSearchItemResult, UpdatedItemsType, ItemInDb } from "@/types";
 
 dayjs.extend(relativeTime);
 
@@ -183,20 +183,24 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
     );
     const listed = await response.json();
     console.log("listed item", listed);
-    if (listed.success) {
-      await prisma.$transaction(
-        items.map((item) =>
-          prisma.item.update({
-            where: {
-              id: item.id,
-            },
-            data: {
-              currentPrice: item.price / 1000,
-            },
-          })
-        )
-      );
-    }
+    await prisma.$transaction(
+      items.map((item) =>
+        prisma.item.update({
+          where: {
+            id: item.id,
+          },
+          data: {
+            currentPrice: item.price / 1000,
+            botSuccess: listed.success ? true : false,
+            message: listed.success
+              ? "Updated sucessfully"
+              : listed.msg
+              ? listed.msg
+              : "Error while listing item",
+          },
+        })
+      )
+    );
   } catch (err) {
     console.log("error while listing items", err);
   }
@@ -228,20 +232,24 @@ async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
       requestOptions
     );
     const updated = await response.json();
-    if (updated.success) {
-      await prisma.$transaction(
-        items.map((item) =>
-          prisma.item.update({
-            where: {
-              id: item.id,
-            },
-            data: {
-              currentPrice: item.price / 1000,
-            },
-          })
-        )
-      );
-    }
+    await prisma.$transaction(
+      items.map((item) =>
+        prisma.item.update({
+          where: {
+            id: item.id,
+          },
+          data: {
+            currentPrice: item.price / 1000,
+            botSuccess: updated.success ? true : false,
+            message: updated.success
+              ? "Updated sucessfully"
+              : updated.msg
+              ? updated.msg
+              : "Error while updating price",
+          },
+        })
+      )
+    );
   } catch (err) {
     console.log("error while updating prices on wax peer");
   }

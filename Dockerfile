@@ -6,13 +6,7 @@ COPY package.json .
 
 COPY . .
 
-RUN npm install --production --silent
-
-
-# RUN npm i -D prisma
-# RUN  prisma generate  --schema=./prisma/schema.prisma
-# RUN npm install @prisma/client
-# RUN npm install @prisma/migrate
+RUN npm install --silent
 
 RUN npx prisma migrate deploy
 

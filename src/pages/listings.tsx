@@ -1,11 +1,11 @@
 import React from "react";
 import { Table, Input, Modal, message, InputNumber, Card, Button } from "antd";
-import Layout from "../components/Layout";
-import prisma from "../lib/prisma";
+import Layout from "@/components/Layout";
+import prisma from "@/lib/prisma";
 import EditOutlined from "@ant-design/icons/EditOutlined";
 import DeleteOutlined from "@ant-design/icons/DeleteOutlined";
 import { GetServerSideProps } from "next";
-import EditItemModal from "../components/EditItemModal";
+import EditItemModal from "@/components/EditItemModal";
 import { CheckCircleTwoTone, StopTwoTone } from "@ant-design/icons";
 const Listings: React.FC<any> = ({ items }) => {
   const [search, setSearch] = React.useState<string>("");
@@ -63,10 +63,17 @@ const Listings: React.FC<any> = ({ items }) => {
             showSizeChanger: true,
             pageSizeOptions: ["50", "100"],
           }}
-          dataSource={items.filter(
-            (item: any) =>
-              item.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
-          )}
+          dataSource={items
+            .filter(
+              (item: any) =>
+                item.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
+            )
+            .map((item: any) => {
+              return {
+                ...item,
+                key: item.id,
+              };
+            })}
           scroll={{ x: 1400 }}
           columns={[
             {

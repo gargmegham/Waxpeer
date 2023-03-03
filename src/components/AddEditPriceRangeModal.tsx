@@ -10,7 +10,7 @@ import {
   Form,
   Card,
 } from "antd";
-import { PriceRange } from "../types";
+import { PriceRange } from "@/types";
 
 const AddEditPriceRangeModal: React.FC<any> = ({
   setShowModal,

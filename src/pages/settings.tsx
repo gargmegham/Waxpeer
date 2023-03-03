@@ -1,5 +1,5 @@
-import prisma from "../lib/prisma";
-import Layout from "../components/Layout";
+import prisma from "@/lib/prisma";
+import Layout from "@/components/Layout";
 import { GetServerSideProps } from "next";
 import {
   Card,
@@ -16,8 +16,8 @@ import {
 } from "antd";
 import React from "react";
 import EditOutlined from "@ant-design/icons/EditOutlined";
-import { availableSources } from "../constants";
-import AddEditPriceRangeModal from "../components/AddEditPriceRangeModal";
+import { availableSources } from "@/constants";
+import AddEditPriceRangeModal from "@/components/AddEditPriceRangeModal";
 
 const Settings: React.FC<any> = ({ settings }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
@@ -114,7 +114,6 @@ const Settings: React.FC<any> = ({ settings }) => {
                 ]}
               >
                 <Select
-                  defaultValue={settings.source}
                   style={{ width: 230 }}
                   options={availableSources.map((source: string) => ({
                     label: source,
@@ -139,7 +138,6 @@ const Settings: React.FC<any> = ({ settings }) => {
                 <InputNumber
                   min={0}
                   size="large"
-                  defaultValue={settings.undercutPrice}
                   formatter={(value) =>
                     `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
@@ -162,7 +160,6 @@ const Settings: React.FC<any> = ({ settings }) => {
                 <InputNumber
                   min={0}
                   size="large"
-                  defaultValue={settings.undercutPercentage}
                   formatter={(value) => `${value}%`}
                 />
               </Form.Item>
@@ -186,10 +183,7 @@ const Settings: React.FC<any> = ({ settings }) => {
                 name="waxpeerApiKey"
                 rules={[{ required: true, message: "Required field!" }]}
               >
-                <Input
-                  disabled={!editMode}
-                  defaultValue={settings.waxpeerApiKey}
-                />
+                <Input disabled={!editMode} />
               </Form.Item>
             </Col>
           </Row>
@@ -197,41 +191,31 @@ const Settings: React.FC<any> = ({ settings }) => {
             <Col span={4}>Priceempire API Key</Col>
             <Col span={12}>
               <Form.Item name="priceEmpireApiKey">
-                <Input
-                  disabled={!editMode}
-                  defaultValue={settings.priceEmpireApiKey}
-                />
+                <Input disabled={!editMode} />
               </Form.Item>
             </Col>
           </Row>
           <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
             <Col span={4}>Status</Col>
             <Col span={4}>
-              <Form.Item name="paused" valuePropName="paused">
+              <Form.Item name="paused" valuePropName="checked">
                 <Switch
                   defaultChecked={settings.paused}
-                  disabled={!editMode}
-                  checkedChildren={"Paused"}
-                  unCheckedChildren={"Running"}
+                  unCheckedChildren="Running"
+                  checkedChildren="Paused"
                 />
               </Form.Item>
             </Col>
             <Col span={4}>WaxPeer API Frequency (Per Minute)</Col>
             <Col span={4}>
               <Form.Item name="waxpeerRateLimit">
-                <InputNumber
-                  disabled={!editMode}
-                  defaultValue={settings.waxpeerRateLimit}
-                />
+                <InputNumber disabled={!editMode} />
               </Form.Item>
             </Col>
             <Col span={4}>PriceEmpire API Frequency (Per Minute)</Col>
             <Col span={4}>
               <Form.Item name="priceEmpireRateLimit">
-                <InputNumber
-                  disabled={!editMode}
-                  defaultValue={settings.PriceEmpireRateLimit}
-                />
+                <InputNumber disabled={!editMode} />
               </Form.Item>
             </Col>
           </Row>
@@ -265,7 +249,12 @@ const Settings: React.FC<any> = ({ settings }) => {
         }
       >
         <Table
-          dataSource={priceRanges}
+          dataSource={priceRanges.map((priceRange: any, index: number) => {
+            return {
+              ...priceRange,
+              key: index,
+            };
+          })}
           columns={[
             {
               title: "From",
