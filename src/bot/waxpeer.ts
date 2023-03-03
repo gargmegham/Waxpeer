@@ -22,10 +22,7 @@ export async function waxPeerBot() {
 
     const maxBotWaitLimit = settings?.waxpeerRateLimit || 1;
 
-    //if bot is paused return
-    if (settings?.paused) {
-      return;
-    }
+    if (settings?.paused) return;
 
     //do not run bot if last run from now is less than wait time
     if (
@@ -34,6 +31,7 @@ export async function waxPeerBot() {
         "minute"
       ) < maxBotWaitLimit
     ) {
+      console.log("waxpeer bot is waiting...");
       return;
     }
 
@@ -44,10 +42,6 @@ export async function waxPeerBot() {
 
     //do not change this loop to forEach or map there is synchronous issue
     for (const itemToBeTraded of itemsNeedTobeTraded) {
-      //if the source price cannot be fetched then update the item status with Cannot fetch source price
-
-      // fetch new source price and update the database
-
       if (
         !itemToBeTraded.sourcePrice ||
         !itemToBeTraded.priceRangeMin ||
@@ -55,6 +49,7 @@ export async function waxPeerBot() {
         !itemToBeTraded.priceRangePercentage ||
         !itemToBeTraded.whenNoOneToUndercutListUsing
       ) {
+        console.log("itemToBeTraded has some data missing, skipping..", itemToBeTraded);
         return;
       }
       const sourcePrice: number = itemToBeTraded.sourcePrice;

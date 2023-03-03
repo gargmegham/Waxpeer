@@ -40,8 +40,6 @@ export async function priceEmpireBot() {
     const latestSourcePrices = await getAllItemPrices(
       settings.source || "buff"
     );
-    console.log(latestSourcePrices, "latestSourcePrices");
-    // const latestSourcePrices: any = mockedData;
     const updateBatch = [];
     itemsTobeUpdated.map((itemToBeTraded: ItemInDb) => {
       //if the source price cannot be fetched then update the item status with Cannot fetch source price
