@@ -3,7 +3,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 import prisma from "@/lib/prisma";
 import { ItemInDb } from "@/types";
-// import mockedData from "../../mockedData.js";
 
 dayjs.extend(relativeTime);
 
@@ -44,88 +43,95 @@ export async function priceEmpireBot() {
     // const latestSourcePrices: any = mockedData;
     const updateBatch = [];
     itemsTobeUpdated.map((itemToBeTraded: ItemInDb) => {
-      //if the source price cannot be fetched then update the item status with Cannot fetch source price
-      if (
-        !latestSourcePrices[itemToBeTraded.name] ||
-        !latestSourcePrices[itemToBeTraded.name][settings.source] ||
-        !latestSourcePrices[itemToBeTraded.name][settings.source].price ||
-        Number.isNaN(
-          Number(latestSourcePrices[itemToBeTraded.name][settings.source].price)
-        )
-      ) {
-        updateBatch.push(
-          prisma.item.update({
-            where: {
-              id: itemToBeTraded.id,
-            },
-            data: {
-              botSuccess: false,
-              message: "Cannot fetch source price",
-            },
-          })
-        );
-        console.log("cannot fetch source price");
-        return;
-      }
-
-      const sourcePrice: number =
-        latestSourcePrices[itemToBeTraded.name][settings.source].price / 100;
-      let priceRangeMin: number = 0,
-        priceRangeMax: number = 0,
-        priceRangePercentage: number = 0,
-        whenNoOneToUndercutListUsing = "percentage";
-
-      let foundAtLeastOnePriceRange = false;
-      settings.priceRange.map((priceRange) => {
+      try {
+        //if the source price cannot be fetched then update the item status with Cannot fetch source price
         if (
-          !foundAtLeastOnePriceRange &&
-          priceRange.sourcePriceMin <= sourcePrice &&
-          priceRange.sourcePriceMax > sourcePrice
+          !latestSourcePrices[itemToBeTraded.name] ||
+          !latestSourcePrices[itemToBeTraded.name][settings.source] ||
+          !latestSourcePrices[itemToBeTraded.name][settings.source].price ||
+          Number.isNaN(
+            Number(
+              latestSourcePrices[itemToBeTraded.name][settings.source].price
+            )
+          )
         ) {
-          priceRangeMin = sourcePrice * (priceRange.priceRangeMin / 100);
-          priceRangeMax = sourcePrice * (priceRange.priceRangeMax / 100);
-          priceRangePercentage = priceRange.priceRangePercentage;
-          whenNoOneToUndercutListUsing =
-            priceRange.whenNoOneToUndercutListUsing;
-          foundAtLeastOnePriceRange = true;
-          console.log("found price range");
+          updateBatch.push(
+            prisma.item.update({
+              where: {
+                id: itemToBeTraded.id,
+              },
+              data: {
+                botSuccess: false,
+                message: "Cannot fetch source price",
+              },
+            })
+          );
+          console.log("cannot fetch source price");
           return;
         }
-      });
-      if (!foundAtLeastOnePriceRange) {
-        updateBatch.push(
-          prisma.item.update({
-            where: {
-              id: itemToBeTraded.id,
-            },
-            data: {
-              botSuccess: false,
-              message: "Cannot find price range for this item",
-            },
-          })
-        );
-        console.log("cannot find price range for this item");
+
+        const sourcePrice: number =
+          latestSourcePrices[itemToBeTraded.name][settings.source].price / 100;
+        let priceRangeMin: number = 0,
+          priceRangeMax: number = 0,
+          priceRangePercentage: number = 0,
+          whenNoOneToUndercutListUsing = "percentage";
+
+        let foundAtLeastOnePriceRange = false;
+        settings.priceRange.map((priceRange) => {
+          if (
+            !foundAtLeastOnePriceRange &&
+            priceRange.sourcePriceMin <= sourcePrice &&
+            priceRange.sourcePriceMax > sourcePrice
+          ) {
+            priceRangeMin = sourcePrice * (priceRange.priceRangeMin / 100);
+            priceRangeMax = sourcePrice * (priceRange.priceRangeMax / 100);
+            priceRangePercentage = priceRange.priceRangePercentage;
+            whenNoOneToUndercutListUsing =
+              priceRange.whenNoOneToUndercutListUsing;
+            foundAtLeastOnePriceRange = true;
+            console.log("found price range");
+            return;
+          }
+        });
+        if (!foundAtLeastOnePriceRange) {
+          updateBatch.push(
+            prisma.item.update({
+              where: {
+                id: itemToBeTraded.id,
+              },
+              data: {
+                botSuccess: false,
+                message: "Cannot find price range for this item",
+              },
+            })
+          );
+          console.log("cannot find price range for this item");
+          return;
+        } else
+          updateBatch.push(
+            prisma.item.update({
+              where: {
+                id: itemToBeTraded.id,
+              },
+              data: {
+                sourcePrice: sourcePrice / 100,
+                whenNoOneToUndercutListUsing,
+                priceRangePercentage,
+                undercutPrice: settings.undercutPrice,
+                undercutPercentage: settings.undercutPercentage,
+                undercutByPriceOrPercentage:
+                  settings.undercutByPriceOrPercentage,
+                priceRangeMin,
+                botSuccess: true,
+                message: "valid price found",
+                priceRangeMax,
+              },
+            })
+          );
+      } catch {
         return;
-      } else
-        updateBatch.push(
-          prisma.item.update({
-            where: {
-              id: itemToBeTraded.id,
-            },
-            data: {
-              sourcePrice: sourcePrice / 100,
-              whenNoOneToUndercutListUsing,
-              priceRangePercentage,
-              undercutPrice: settings.undercutPrice,
-              undercutPercentage: settings.undercutPercentage,
-              undercutByPriceOrPercentage: settings.undercutByPriceOrPercentage,
-              priceRangeMin,
-              botSuccess: true,
-              message: "valid price found",
-              priceRangeMax,
-            },
-          })
-        );
+      }
     });
     updateBatch.push(
       prisma.user.update({
