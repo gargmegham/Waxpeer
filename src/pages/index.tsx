@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Router from "next/router";
-import { updateFloat } from "@/bot/updatefloat";
 import styles from "@/styles/Login.module.css";
 
 const Login: React.FC = () => {
@@ -17,19 +16,15 @@ const Login: React.FC = () => {
         body: JSON.stringify(body),
       });
       const data = await res.json();
+      await fetch(`/api/activatebot`);
       if (data.error) {
         alert(data.error);
         return;
       }
-
-      await fetch(`/api/activatebot`);
-
       localStorage.setItem("token", data.token);
       await Router.push("/listings");
     } catch (error) {
       console.error(error);
-    } finally {
-      updateFloat();
     }
   };
 

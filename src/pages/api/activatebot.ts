@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { waxPeerBot } from "@/bot/waxpeer";
 import { priceEmpireBot } from "@/bot/priceempire";
 import cronSchedule from "@/bot/cron";
+import { updateFloat } from "@/bot/updatefloat";
 
 const priceEmpireBotJob = cronSchedule(priceEmpireBot);
 const waxPeerBotJob = cronSchedule(waxPeerBot);
@@ -24,6 +25,7 @@ export default async function handle(
       waxPeerBotJob.start();
       taskArray.push(priceEmpireBotJob);
       taskArray.push(waxPeerBotJob);
+      updateFloat();
       return res.status(200).json({ status: true });
     }
   } catch (e: any) {
