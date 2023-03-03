@@ -114,7 +114,7 @@ export async function priceEmpireBot() {
               id: itemToBeTraded.id,
             },
             data: {
-              sourcePrice: sourcePrice / 100,
+              sourcePrice: sourcePrice,
               whenNoOneToUndercutListUsing,
               priceRangePercentage,
               undercutPrice: settings.undercutPrice,
