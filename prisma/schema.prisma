@@ -30,6 +30,9 @@ model Settings {
   undercutByPriceOrPercentage String @default("price")
   paused Boolean @default(false)
   priceRange PriceRange[]
+  listItemFrom Float @default(0)
+  listItemTo Float @default(10000)
+  noOfItemsRoListAtATime Int @default(100)
 }
 
 model PriceRange{

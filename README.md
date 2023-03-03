@@ -32,5 +32,7 @@ docker-compose up -d --build
 
 ### SETUP
 
-- Download node on your system https://nodejs.org/en/download/
-- Open terminal goto project directory and run: npm install && npm run dev
+- Download docker on your system https://docs.docker.com/desktop/install/windows-install/
+- Paste this source code to your `C:\` drive
+- Open PowerShell and run this command:
+  cd C:\waxpeer-bot && docker-compose up -d --build -d
