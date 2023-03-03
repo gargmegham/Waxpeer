@@ -3,7 +3,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 import prisma from "../lib/prisma";
 import { ItemInDb } from "../types";
-import mockedData from "../mockedResponse";
+// import mockedData from "../../mockedData.js";
 
 dayjs.extend(relativeTime);
 
@@ -27,8 +27,10 @@ export async function priceEmpireBot() {
       },
     });
     if (
+      botLastRun &&
+      botLastRun.priceEmpireLastRun &&
       dayjs(new Date()).diff(
-        new Date(botLastRun?.priceEmpireLastRun || new Date()),
+        new Date(botLastRun.priceEmpireLastRun),
         "minute"
       ) < maxBotWaitLimit
     ) {
@@ -36,10 +38,10 @@ export async function priceEmpireBot() {
       return;
     }
     const itemsTobeUpdated: Array<ItemInDb> = await prisma.item.findMany();
-    // const latestSourcePrices = await getAllItemPrices(
-    //   settings.source || "buff"
-    // );
-    const latestSourcePrices: any = mockedData;
+    const latestSourcePrices = await getAllItemPrices(
+      settings.source || "buff"
+    );
+    // const latestSourcePrices: any = mockedData;
     const updateBatch = [];
     itemsTobeUpdated.map((itemToBeTraded: ItemInDb) => {
       //if the source price cannot be fetched then update the item status with Cannot fetch source price
@@ -118,6 +120,8 @@ export async function priceEmpireBot() {
               undercutPercentage: settings.undercutPercentage,
               undercutByPriceOrPercentage: settings.undercutByPriceOrPercentage,
               priceRangeMin,
+              botSuccess: true,
+              message: "valid price found",
               priceRangeMax,
             },
           })

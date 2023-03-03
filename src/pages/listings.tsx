@@ -63,10 +63,17 @@ const Listings: React.FC<any> = ({ items }) => {
             showSizeChanger: true,
             pageSizeOptions: ["50", "100"],
           }}
-          dataSource={items.filter(
-            (item: any) =>
-              item.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
-          )}
+          dataSource={items
+            .filter(
+              (item: any) =>
+                item.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
+            )
+            .map((item: any) => {
+              return {
+                ...item,
+                key: item.id,
+              };
+            })}
           scroll={{ x: 1400 }}
           columns={[
             {
