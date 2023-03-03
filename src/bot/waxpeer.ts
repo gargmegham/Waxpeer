@@ -73,7 +73,8 @@ export async function waxPeerBot() {
         );
         newPrice =
           itemToBeTraded.undercutByPriceOrPercentage === "percentage"
-            ? minPriceFromRange * (itemToBeTraded.undercutPercentage / 100)
+            ? (minPriceFromRange * (100 - itemToBeTraded.undercutPercentage)) /
+              100
             : minPriceFromRange - itemToBeTraded.undercutPrice;
       } else {
         //if there are no items in price range
@@ -153,12 +154,6 @@ async function searchItemsInWaxPeer(itemName: string) {
 
 async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
   try {
-    const payload = {
-      items: items.map((item) => ({
-        item_id: item.item_id,
-        price: item.price,
-      })),
-    };
     const settings = await prisma.settings.findUnique({
       where: {
         id: 1,
@@ -167,6 +162,12 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
     const apiKey: string = settings?.waxpeerApiKey || "";
     let myHeaders = new Headers();
     myHeaders.append("accept", "application/json");
+    const payload = {
+      items: items.map((item) => ({
+        item_id: item.item_id,
+        price: item.price,
+      })),
+    };
     let requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -177,7 +178,6 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
       requestOptions
     );
     const listed = await response.json();
-    console.log("listed item", listed);
     await prisma.$transaction(
       items.map((item) =>
         prisma.item.update({
