@@ -163,8 +163,7 @@ async function getAllItemPrices(source: string) {
       `https://pricempire.com/api/v3/getAllItems?api_key=${apiKey}&sources=${source}'`,
       requestOptions
     );
-    const { items } = await response.json();
-    return items;
+    return await response.json();
   } catch (err) {
     console.log("getting error from priceempire API", err);
   }
