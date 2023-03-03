@@ -40,6 +40,7 @@ export async function priceEmpireBot() {
     const latestSourcePrices = await getAllItemPrices(
       settings.source || "buff"
     );
+    console.log(latestSourcePrices, "latestSourcePrices");
     // const latestSourcePrices: any = mockedData;
     const updateBatch = [];
     itemsTobeUpdated.map((itemToBeTraded: ItemInDb) => {

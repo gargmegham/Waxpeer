@@ -7,6 +7,7 @@ services:
       - .:/usr/src/app/
     ports:
       - 3000:3000
+    restart: unless-stopped
 
   nginx:
     build: ./nginx
@@ -14,3 +15,4 @@ services:
       - "80:80"
     depends_on:
       - web
+    restart: unless-stopped
