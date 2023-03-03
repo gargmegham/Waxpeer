@@ -164,7 +164,7 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
     myHeaders.append("accept", "application/json");
     const payload = {
       items: items.map((item) => ({
-        item_id: item.item_id,
+        item_id: Number.parseInt(item.item_id),
         price: item.price,
       })),
     };
