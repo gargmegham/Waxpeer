@@ -29,3 +29,8 @@
 ```
 docker-compose up -d --build
 ```
+
+### SETUP
+
+- Download node on your system https://nodejs.org/en/download/
+- Open terminal goto project directory and run: npm install && npm run dev
