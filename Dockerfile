@@ -8,11 +8,9 @@ COPY . .
 
 RUN npm install --silent
 
-# RUN npx prisma migrate deploy
+RUN npx prisma migrate deploy
 
-# RUN npm run build
+RUN npm run build
 
-# CMD npm start 
-
-CMD npm run dev 
+CMD npm start 
 
