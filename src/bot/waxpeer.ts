@@ -178,6 +178,7 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
       requestOptions
     );
     const listed = await response.json();
+    console.log("listed", listed, requestOptions.body)
     await prisma.$transaction(
       items.map((item) =>
         prisma.item.update({
