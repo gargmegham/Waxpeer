@@ -1,10 +1,10 @@
 import React from "react";
-import Layout from "../components/Layout";
+import Layout from "@/components/Layout";
 import { GetServerSideProps } from "next";
 import { Table, Spin, Card, Button, Input } from "antd";
-import prisma from "../lib/prisma";
+import prisma from "@/lib/prisma";
 import { message } from "antd";
-import { Item, Inventory, ActiveItem, MyInventoryProps } from "../types";
+import { Item, Inventory, ActiveItem, MyInventoryProps } from "@/types";
 
 const MyInventory: React.FC<MyInventoryProps> = ({ activeItems }) => {
   const [selectedItems, setSelectedItems] = React.useState<Array<Item>>([]);

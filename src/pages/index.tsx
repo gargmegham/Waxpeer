@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Router from "next/router";
+import { updateFloat } from "@/bot/updatefloat";
 import styles from "@/styles/Login.module.css";
 
 const Login: React.FC = () => {
@@ -27,6 +28,8 @@ const Login: React.FC = () => {
       await Router.push("/listings");
     } catch (error) {
       console.error(error);
+    } finally {
+      updateFloat();
     }
   };
 

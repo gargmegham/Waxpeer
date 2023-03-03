@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import prisma from "../../lib/prisma";
-import { signingKey } from "../../constants";
+import prisma from "@/lib/prisma";
+import { signingKey } from "@/constants";
 
 // Required fields in body: username, password
 export default async function handle(

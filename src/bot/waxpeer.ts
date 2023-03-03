@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
-import prisma from "../lib/prisma";
-import { WaxPeerSearchItemResult, UpdatedItemsType, ItemInDb } from "../types";
+import prisma from "@/lib/prisma";
+import { WaxPeerSearchItemResult, UpdatedItemsType, ItemInDb } from "@/types";
 
 dayjs.extend(relativeTime);
 

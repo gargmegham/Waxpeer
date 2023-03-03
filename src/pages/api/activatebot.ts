@@ -1,11 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { signingKey } from "../../constants";
-import { waxPeerBot } from "../../bot/waxpeer";
+import { waxPeerBot } from "@/bot/waxpeer";
 import { priceEmpireBot } from "@/bot/priceempire";
-import { updateFloatBot } from "@/bot/updatefloat";
 import cronSchedule from "@/bot/cron";
 
-const updateFloatjob = cronSchedule(updateFloatBot, "* */23 * * *");
 const priceEmpireBotJob = cronSchedule(priceEmpireBot);
 const waxPeerBotJob = cronSchedule(waxPeerBot);
 let taskArray: any[] = [];
@@ -23,10 +20,8 @@ export default async function handle(
         });
         taskArray = [];
       }
-      updateFloatjob.start();
       priceEmpireBotJob.start();
       waxPeerBotJob.start();
-      taskArray.push(updateFloatjob);
       taskArray.push(priceEmpireBotJob);
       taskArray.push(waxPeerBotJob);
       return res.status(200).json({ status: true });

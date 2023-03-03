@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { useRouter } from "next/router";
-import Header from "./Header";
+import Header from "@/components/Header";
 import styles from "@/components/Layout.module.css";
 
 const Layout: React.FC<any> = (props) => {

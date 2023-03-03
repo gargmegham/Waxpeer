@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
-import prisma from "../lib/prisma";
-import { ItemInDb } from "../types";
+import prisma from "@/lib/prisma";
+import { ItemInDb } from "@/types";
 // import mockedData from "../../mockedData.js";
 
 dayjs.extend(relativeTime);

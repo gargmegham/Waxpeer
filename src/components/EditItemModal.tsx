@@ -12,7 +12,7 @@ import {
   Form,
   Card,
 } from "antd";
-import { SelectedItem, EditItemModalProps } from "../types";
+import { SelectedItem, EditItemModalProps } from "@/types";
 
 const EditItemModal: React.FC<EditItemModalProps> = ({
   setShowModal,

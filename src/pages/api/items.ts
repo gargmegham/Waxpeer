@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { signingKey } from "../../constants";
-import prisma from "../../lib/prisma";
-import { Item } from "../../types";
+import { signingKey } from "@/constants";
+import prisma from "@/lib/prisma";
+import { Item } from "@/types";
 
 export default async function handle(
   req: NextApiRequest,

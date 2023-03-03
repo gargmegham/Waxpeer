@@ -1,5 +1,5 @@
-import prisma from "../lib/prisma";
-import Layout from "../components/Layout";
+import prisma from "@/lib/prisma";
+import Layout from "@/components/Layout";
 import { GetServerSideProps } from "next";
 import {
   Card,
@@ -16,8 +16,8 @@ import {
 } from "antd";
 import React from "react";
 import EditOutlined from "@ant-design/icons/EditOutlined";
-import { availableSources } from "../constants";
-import AddEditPriceRangeModal from "../components/AddEditPriceRangeModal";
+import { availableSources } from "@/constants";
+import AddEditPriceRangeModal from "@/components/AddEditPriceRangeModal";
 
 const Settings: React.FC<any> = ({ settings }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);

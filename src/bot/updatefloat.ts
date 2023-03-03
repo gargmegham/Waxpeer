@@ -1,34 +1,13 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
-import prisma from "../lib/prisma";
-import { ItemInDb, PrimsaUpdateArgumnt } from "../types";
+import prisma from "@/lib/prisma";
+import { ItemInDb, PrimsaUpdateArgumnt } from "@/types";
 
 dayjs.extend(relativeTime);
 
-export async function updateFloatBot() {
-  console.log("update float bot running");
+export async function updateFloat() {
   try {
-    const botLastRun = await prisma.user.findUnique({
-      where: {
-        username: "admin",
-      },
-    });
-
-    const settings = await prisma.settings.findUnique({
-      where: { id: 1 },
-      include: { priceRange: true },
-    });
-    if (settings?.paused) return;
-
-    // if (
-    //   dayjs(new Date()).diff(
-    //     new Date(botLastRun?.botLastRun || new Date()),
-    //     "hour"
-    //   ) < 24
-    // )
-    //   return;
-
     const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
     let updateItems: Array<PrimsaUpdateArgumnt> = [];
     for (const itemToTrade of itemsNeedTobeTraded) {
@@ -47,7 +26,7 @@ export async function updateFloatBot() {
       updateItems.map((item) => prisma.item.update(item))
     );
   } catch (err) {
-    console.log("update float bot error");
+    console.log("update float bot error", err);
   }
 }
 
