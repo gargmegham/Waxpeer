@@ -140,6 +140,7 @@ async function searchItemsInWaxPeer(itemName: string) {
   const apiKey: string = settings?.waxpeerApiKey || "";
   let myHeaders = new Headers();
   myHeaders.append("accept", "application/json");
+  myHeaders.append("Content-Type", "application/json");
   let requestOptions = {
     method: "GET",
     headers: myHeaders,
@@ -178,7 +179,7 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
       requestOptions
     );
     const listed = await response.json();
-    console.log("listed", listed, requestOptions.body)
+    console.log("listed", listed, requestOptions.body);
     await prisma.$transaction(
       items.map((item) =>
         prisma.item.update({
@@ -218,6 +219,7 @@ async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
     const apiKey: string = settings?.waxpeerApiKey || "";
     let myHeaders = new Headers();
     myHeaders.append("accept", "application/json");
+    myHeaders.append("Content-Type", "application/json");
     let requestOptions = {
       method: "POST",
       headers: myHeaders,
