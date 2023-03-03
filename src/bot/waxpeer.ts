@@ -23,6 +23,7 @@ export async function waxPeerBot() {
     const maxBotWaitLimit = settings?.waxpeerRateLimit || 1;
 
     if (settings?.paused) return;
+    if (!settings) return;
 
     //do not run bot if last run from now is less than wait time
     if (
@@ -39,6 +40,8 @@ export async function waxPeerBot() {
     let updateItemPrice: Array<UpdatedItemsType> = [];
     let listItems: Array<UpdatedItemsType> = [];
     let itemsUpdated: Array<ItemInDb> = [];
+    const maxItemsToUpdate = 50;
+    const maxItemsToList = settings.noOfItemsRoListAtATime;
 
     //do not change this loop to forEach or map there is synchronous issue
     for (const itemToBeTraded of itemsNeedTobeTraded) {
@@ -50,6 +53,15 @@ export async function waxPeerBot() {
         !itemToBeTraded.whenNoOneToUndercutListUsing
       ) {
         console.log("itemToBeTraded has some data missing, skipping..");
+        continue;
+      }
+      if (
+        itemToBeTraded.sourcePrice > settings.listItemTo ||
+        itemToBeTraded.sourcePrice < settings.listItemFrom
+      ) {
+        console.log(
+          "itemToBeTraded price is out of listing settings range, skipping.."
+        );
         continue;
       }
       const sourcePrice: number = itemToBeTraded.sourcePrice;
@@ -124,8 +136,13 @@ export async function waxPeerBot() {
       },
     });
     if (updateItemPrice.length)
-      await updateItemPricesOnWaxPeer(updateItemPrice);
-    if (listItems.length) await listItemsOnWaxPeer(listItems);
+      // update items price in batch of maxItemsToUpdate
+      for (let i = 0; i < updateItemPrice.length; i += maxItemsToUpdate)
+        await updateItemPricesOnWaxPeer(
+          updateItemPrice.slice(i, i + maxItemsToUpdate)
+        );
+    if (listItems.length)
+      listItemsOnWaxPeer(listItems.slice(0, maxItemsToList));
   } catch (err) {
     console.log("error in updating bot status", err);
   }

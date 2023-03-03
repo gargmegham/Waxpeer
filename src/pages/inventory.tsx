@@ -1,14 +1,25 @@
 import React from "react";
 import Layout from "@/components/Layout";
 import { GetServerSideProps } from "next";
-import { Table, Spin, Card, Button, Input } from "antd";
+import {
+  Table,
+  Spin,
+  InputNumber,
+  Form,
+  Card,
+  Button,
+  Modal,
+  Input,
+} from "antd";
 import prisma from "@/lib/prisma";
 import { message } from "antd";
 import { Item, Inventory, ActiveItem, MyInventoryProps } from "@/types";
 
-const MyInventory: React.FC<MyInventoryProps> = ({ activeItems }) => {
+const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
   const [selectedItems, setSelectedItems] = React.useState<Array<Item>>([]);
   const [search, setSearch] = React.useState<string>("");
+  const [listingModal, setListingModal] = React.useState(false);
+
   React.useState<boolean>(false);
   const [inventory, setInventory] = React.useState<Inventory>({
     count: 0,
@@ -16,6 +27,22 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems }) => {
     success: false,
   });
   const [loading, setLoading] = React.useState<boolean>(true);
+
+  const saveListingSettings = async (values: any) => {
+    setListingModal(false);
+    await fetch("/api/listing", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ values }),
+    });
+    message.success("Listing Settings updated!");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
 
   React.useEffect(() => {
     const fetchInventory = async () => {
@@ -57,7 +84,6 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems }) => {
       setSelectedItems(selectedRows);
     },
   };
-
   const addItems = async (addAll: boolean) => {
     const items: Array<Item> = addAll ? inventory.items : selectedItems;
     await fetch("/api/items", {
@@ -84,6 +110,13 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems }) => {
         title="My Inventory"
         extra={
           <>
+            <Button
+              type="default"
+              style={{ marginRight: "10px" }}
+              onClick={() => setListingModal(true)}
+            >
+              Listing Settings
+            </Button>
             <Button
               type="primary"
               disabled={selectedItems.length !== 0}
@@ -151,6 +184,61 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems }) => {
           ]}
         />
       </Card>
+      {listingModal ? (
+        <Modal
+          open={listingModal}
+          title="Listing Setting"
+          onCancel={() => setListingModal(false)}
+          footer={null}
+        >
+          <Form
+            name="listing-settings"
+            layout="vertical"
+            onFinish={saveListingSettings}
+            initialValues={settings}
+          >
+            <Form.Item
+              label="List Items From"
+              name="listItemFrom"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select a value!",
+                },
+              ]}
+            >
+              <InputNumber min={0} />
+            </Form.Item>
+            <Form.Item
+              label="List Items To"
+              name="listItemTo"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select a value!",
+                },
+              ]}
+            >
+              <InputNumber min={0} />
+            </Form.Item>
+            <Form.Item
+              label="How Many Items To List At A Time"
+              name="noOfItemsRoListAtATime"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select a value!",
+                },
+              ]}
+            >
+              <InputNumber min={0} />
+            </Form.Item>
+            <Button type="primary" htmlType="submit">
+              Save
+            </Button>
+          </Form>
+        </Modal>
+      ) : null}
     </Layout>
   );
 };
@@ -162,8 +250,13 @@ export const getServerSideProps: GetServerSideProps = async () => {
       item_id: true,
     },
   });
+  const settings = await prisma.settings.findUnique({
+    where: {
+      id: 1,
+    },
+  });
   return {
-    props: { activeItems },
+    props: { activeItems, settings },
   };
 };
 

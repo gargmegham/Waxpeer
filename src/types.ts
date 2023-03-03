@@ -67,6 +67,7 @@ export type ActiveItem = {
 
 export type MyInventoryProps = {
   activeItems: Array<ActiveItem>;
+  settings: any;
 };
 
 export type AddSelectedItemsProps = {
