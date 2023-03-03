@@ -9,31 +9,31 @@ dayjs.extend(relativeTime);
 export async function waxPeerBot() {
   console.log("waxpeer bot running");
   try {
-    // const botLastRun = await prisma.user.findUnique({
-    //   where: {
-    //     username: "admin",
-    //   },
-    // });
+    const botLastRun = await prisma.user.findUnique({
+      where: {
+        username: "admin",
+      },
+    });
 
-    // const settings = await prisma.settings.findUnique({
-    //   where: { id: 1 },
-    //   include: { priceRange: true },
-    // });
+    const settings = await prisma.settings.findUnique({
+      where: { id: 1 },
+      include: { priceRange: true },
+    });
 
-    // const maxBotWaitLimit = settings?.waxpeerRateLimit || 1;
+    const maxBotWaitLimit = settings?.waxpeerRateLimit || 1;
 
-    // if (settings?.paused) return;
+    if (settings?.paused) return;
 
-    // //do not run bot if last run from now is less than wait time
-    // if (
-    //   botLastRun &&
-    //   botLastRun.botLastRun &&
-    //   dayjs(new Date()).diff(new Date(botLastRun.botLastRun), "minute") <
-    //     maxBotWaitLimit
-    // ) {
-    //   console.log("waxpeer bot waiting...");
-    //   return;
-    // }
+    //do not run bot if last run from now is less than wait time
+    if (
+      botLastRun &&
+      botLastRun.botLastRun &&
+      dayjs(new Date()).diff(new Date(botLastRun.botLastRun), "minute") <
+        maxBotWaitLimit
+    ) {
+      console.log("waxpeer bot waiting...");
+      return;
+    }
 
     const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
     let updateItemPrice: Array<UpdatedItemsType> = [];
