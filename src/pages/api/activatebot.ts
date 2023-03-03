@@ -21,11 +21,11 @@ export default async function handle(
         });
         taskArray = [];
       }
-      priceEmpireBotJob.start();
+      // priceEmpireBotJob.start();
       waxPeerBotJob.start();
-      taskArray.push(priceEmpireBotJob);
+      // taskArray.push(priceEmpireBotJob);
       taskArray.push(waxPeerBotJob);
-      updateFloat();
+      // updateFloat();
       return res.status(200).json({ status: true });
     }
   } catch (e: any) {
