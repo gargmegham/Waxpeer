@@ -7,6 +7,7 @@ import DeleteOutlined from "@ant-design/icons/DeleteOutlined";
 import { GetServerSideProps } from "next";
 import EditItemModal from "@/components/EditItemModal";
 import { CheckCircleTwoTone, StopTwoTone } from "@ant-design/icons";
+
 const Listings: React.FC<any> = ({ items }) => {
   const [search, setSearch] = React.useState<string>("");
   const [editItemModalVisible, setEditItemModalVisible] =
@@ -72,6 +73,10 @@ const Listings: React.FC<any> = ({ items }) => {
               return {
                 ...item,
                 key: item.id,
+                pricePercentage:
+                  item.currentPrice && item.sourcePrice
+                    ? (item.currentPrice / item.sourcePrice) * 100
+                    : 0,
               };
             })}
           scroll={{ x: 1400 }}
@@ -241,17 +246,16 @@ const Listings: React.FC<any> = ({ items }) => {
             {
               title: "Price Percentage",
               width: 100,
-              dataIndex: "priceRangePercentage",
+              dataIndex: "pricePercentage",
               sortDirections: ["descend", "ascend"],
               sorter: (a: any, b: any) => a.item_id - b.item_id,
-              render: (priceRangePercentage: number, record: any) => {
+              render: (pricePercentage: number, record: any) => {
                 return (
                   <InputNumber
+                    min={0}
                     disabled={true}
-                    defaultValue={priceRangePercentage || "-"}
-                    formatter={(value) => `${value}%`}
-                    // @ts-ignore
-                    parser={(value) => value!.replace("%", "")}
+                    size="large"
+                    formatter={(value) => (value ? `${value}%` : "N/A")}
                   />
                 );
               },
