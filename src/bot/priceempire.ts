@@ -100,6 +100,10 @@ export async function priceEmpireBot() {
             data: {
               botSuccess: false,
               message: "Cannot find price range for this item",
+              whenNoOneToUndercutListUsing: null,
+              priceRangePercentage: null,
+              priceRangeMin: null,
+              priceRangeMax: null,
             },
           })
         );
