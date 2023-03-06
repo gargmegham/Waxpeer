@@ -75,7 +75,7 @@ const Listings: React.FC<any> = ({ items }) => {
                 key: item.id,
                 pricePercentage:
                   item.currentPrice && item.sourcePrice
-                    ? (item.currentPrice / item.sourcePrice) * 100
+                    ? Math.floor((item.currentPrice / item.sourcePrice) * 100)
                     : 0,
               };
             })}
@@ -255,7 +255,8 @@ const Listings: React.FC<any> = ({ items }) => {
                     min={0}
                     disabled={true}
                     size="large"
-                    formatter={(value) => (value ? `${value}%` : "N/A")}
+                    defaultValue={pricePercentage || "-"}
+                    formatter={(value) => `${value}%`}
                   />
                 );
               },
