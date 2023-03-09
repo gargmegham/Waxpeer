@@ -1,5 +1,7 @@
 # SETUP
 
+## Option 1: Using Docker
+
 - Download docker on your system https://docs.docker.com/desktop/install/windows-install/
 - If you encounter any problem related to virtualisation in bios enable virtualisation in your bios
 - if any error related to wsl Open PowerShell as administrator ans run
@@ -7,6 +9,12 @@
 - Paste this source code to your `C:\` drive
 - Open PowerShell and run this command:
   `cd C:\bot && docker-compose up -d --build`
+
+## Option 2: Using Node
+
+- Download and install node using https://nodejs.org/en/download/
+- open powershell in bot directory
+- run `npm install && npm run dev`
 
 # Code Sharing
 
