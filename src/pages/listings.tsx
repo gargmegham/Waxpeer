@@ -10,6 +10,7 @@ import { CheckCircleTwoTone, StopTwoTone } from "@ant-design/icons";
 
 const Listings: React.FC<any> = ({ items }) => {
   const [search, setSearch] = React.useState<string>("");
+  const [deleting, setDeleting] = React.useState<boolean>(false);
   const [editItemModalVisible, setEditItemModalVisible] =
     React.useState<boolean>(false);
   const [deleteConfirmModalVisible, setDeleteConfirmModalVisible] =
@@ -19,22 +20,27 @@ const Listings: React.FC<any> = ({ items }) => {
   const [editItemModalItem, setEditItemModalItem] = React.useState<any>(null);
 
   const deleteItem = async (deleteAll = false) => {
-    const ids = deleteAll
-      ? items.map((item: any) => item.id)
-      : [deleteConfirmModalItem.id];
-    await fetch("/api/items", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify({ ids }),
-    });
-    message.success("Item deleted");
-    setDeleteConfirmModalVisible(false);
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+    try {
+      setDeleting(true);
+      const ids = deleteAll
+        ? items.map((item: any) => item.id)
+        : [deleteConfirmModalItem.id];
+      await fetch("/api/items", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ ids }),
+      });
+      message.success("Item deleted");
+      setDeleteConfirmModalVisible(false);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -44,6 +50,8 @@ const Listings: React.FC<any> = ({ items }) => {
         extra={
           <Button
             type="primary"
+            disabled={deleting}
+            loading={deleting}
             onClick={() => {
               deleteItem(true);
             }}
@@ -104,6 +112,8 @@ const Listings: React.FC<any> = ({ items }) => {
                       }}
                     ></Button>
                     <Button
+                      disabled={deleting}
+                      loading={deleting}
                       danger
                       icon={<DeleteOutlined />}
                       onClick={() => {

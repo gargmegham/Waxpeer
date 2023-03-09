@@ -20,21 +20,27 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   selectedItem,
 }) => {
   const [inputs, setInputs] = React.useState<SelectedItem>(selectedItem);
+  const [editing, setEditing] = React.useState<boolean>(false);
 
   const submit = async () => {
-    await fetch("/api/items", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify({ inputs }),
-    });
-    message.success("Item edited successfully!");
-    setShowModal(false);
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+    try {
+      setEditing(true);
+      await fetch("/api/items", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ inputs }),
+      });
+      message.success("Item edited successfully!");
+      setShowModal(false);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } finally {
+      setEditing(false);
+    }
   };
 
   return (
@@ -48,6 +54,8 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       footer={[
         <Button
           key="cancel"
+          disabled={editing}
+          loading={editing}
           type="primary"
           danger
           onClick={() => {
@@ -56,7 +64,13 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
         >
           Cancel
         </Button>,
-        <Button key="submit" type="primary" onClick={submit}>
+        <Button
+          disabled={editing}
+          loading={editing}
+          key="submit"
+          type="primary"
+          onClick={submit}
+        >
           Submit
         </Button>,
       ]}
