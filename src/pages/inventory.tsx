@@ -19,6 +19,7 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
   const [selectedItems, setSelectedItems] = React.useState<Array<Item>>([]);
   const [search, setSearch] = React.useState<string>("");
   const [listingModal, setListingModal] = React.useState(false);
+  const [listing, setListing] = React.useState<boolean>(false);
 
   React.useState<boolean>(false);
   const [inventory, setInventory] = React.useState<Inventory>({
@@ -29,19 +30,24 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
   const [loading, setLoading] = React.useState<boolean>(true);
 
   const saveListingSettings = async (values: any) => {
-    setListingModal(false);
-    await fetch("/api/listing", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify({ values, items: inventory.items }),
-    });
-    message.success("Listing Settings updated!");
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+    try {
+      setListing(true);
+      setListingModal(false);
+      await fetch("/api/listing", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ values, items: inventory.items }),
+      });
+      message.success("Listing Settings updated!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } finally {
+      setListing(false);
+    }
   };
 
   React.useEffect(() => {
@@ -113,6 +119,8 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
             <Button
               type="default"
               style={{ marginRight: "10px" }}
+              loading={listing}
+              disabled={listing}
               onClick={() => setListingModal(true)}
             >
               Listing Settings
