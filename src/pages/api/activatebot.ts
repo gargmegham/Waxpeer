@@ -6,6 +6,8 @@ import { updateFloat } from "@/bot/updatefloat";
 
 const priceEmpireBotJob = cronSchedule(priceEmpireBot);
 const waxPeerBotJob = cronSchedule(waxPeerBot);
+const updateFloatJob = cronSchedule(updateFloat);
+
 let taskArray: any[] = [];
 
 // GET /api/activatebot
@@ -23,8 +25,10 @@ export default async function handle(
       }
       priceEmpireBotJob.start();
       waxPeerBotJob.start();
+      updateFloatJob.start();
       taskArray.push(priceEmpireBotJob);
       taskArray.push(waxPeerBotJob);
+      taskArray.push(updateFloatJob);
       updateFloat();
       return res.status(200).json({ status: true });
     }

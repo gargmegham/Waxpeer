@@ -206,6 +206,14 @@ const Settings: React.FC<any> = ({ settings }) => {
                 />
               </Form.Item>
             </Col>
+          </Row>
+          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
+            <Col span={4}>Float Update Frequency (In Minutes)</Col>
+            <Col span={4}>
+              <Form.Item name="floatBotFrequency">
+                <InputNumber disabled={!editMode} />
+              </Form.Item>
+            </Col>
             <Col span={4}>WaxPeer API Frequency (Per Minute)</Col>
             <Col span={4}>
               <Form.Item name="waxpeerRateLimit">
