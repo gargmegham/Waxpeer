@@ -55,15 +55,6 @@ export async function waxPeerBot() {
         console.log("itemToBeTraded has some data missing, skipping..");
         continue;
       }
-      if (
-        itemToBeTraded.sourcePrice > settings.listItemTo ||
-        itemToBeTraded.sourcePrice < settings.listItemFrom
-      ) {
-        console.log(
-          "itemToBeTraded price is out of listing settings range, skipping.."
-        );
-        continue;
-      }
       const sourcePrice: number = itemToBeTraded.sourcePrice;
       const searchedItems = await searchItemsInWaxPeer(itemToBeTraded.name);
       const itemsWithinPriceRange = searchedItems.filter(
