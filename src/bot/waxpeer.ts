@@ -88,11 +88,11 @@ export async function waxPeerBot() {
       }
       const currentItem = searchedItems.find(
         (item: WaxPeerSearchItemResult) =>
-          item.item_id === itemToBeTraded.item_id
+          item.item_id == itemToBeTraded.item_id
       );
       if (currentItem && Object.values(currentItem).length > 0) {
         updateItemPrice.push({
-          id: currentItem.id,
+          id: itemToBeTraded.id,
           item_id: currentItem.item_id,
           price: Math.floor(newPrice * 1000),
         });
@@ -103,6 +103,7 @@ export async function waxPeerBot() {
           price: Math.floor(newPrice * 1000),
         });
       }
+      itemToBeTraded.currentPrice = newPrice;
       itemsUpdated.push(itemToBeTraded);
     }
     //update bot last run

@@ -29,7 +29,6 @@ export default async function handle(
       taskArray.push(priceEmpireBotJob);
       taskArray.push(waxPeerBotJob);
       taskArray.push(updateFloatJob);
-      updateFloat();
       return res.status(200).json({ status: true });
     }
   } catch (e: any) {
