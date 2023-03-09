@@ -31,7 +31,7 @@ const deleteAllFromWaxpeer = async (apiKey: string) => {
   await res.json();
 };
 
-const deleteItemsFromPriceEmpire = async (itemPks: Array<number>) => {
+const deleteItemsFromPrisma = async (itemPks: Array<number>) => {
   const deleteItemsBatch = [];
   for (const itemPk of itemPks) {
     const deleteItem = prisma.item.delete({
@@ -142,7 +142,7 @@ export default async function handle(
       if (apiKey && !deleteAll && itemIds.length > 0)
         deleteItemsFromWaxpeer(itemIds, apiKey);
       else if (apiKey && deleteAll) deleteAllFromWaxpeer(apiKey);
-      await deleteItemsFromPriceEmpire(itemPks);
+      await deleteItemsFromPrisma(itemPks);
       return res.status(200).json({ message: "Item deleted." });
     }
   } catch (e: any) {
