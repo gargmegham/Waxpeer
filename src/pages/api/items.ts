@@ -3,6 +3,45 @@ import { signingKey } from "@/constants";
 import prisma from "@/lib/prisma";
 import { Item } from "@/types";
 
+const deleteItemsFromWaxpeer = async (
+  itemIds: Array<number>,
+  apiKey: string
+) => {
+  let myHeaders = new Headers();
+  myHeaders.append("accept", "application/json");
+  let requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+  };
+  let url = `https://api.waxpeer.com/v1/remove-items?api=${apiKey}`;
+  for (const id of itemIds) url += `&id=${id}`;
+  const res = await fetch(url, requestOptions);
+  await res.json();
+};
+
+const deleteAllFromWaxpeer = async (apiKey: string) => {
+  let myHeaders = new Headers();
+  myHeaders.append("accept", "application/json");
+  let requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+  };
+  const url = `https://api.waxpeer.com/v1/remove-all?api=${apiKey}`;
+  const res = await fetch(url, requestOptions);
+  await res.json();
+};
+
+const deleteItemsFromPriceEmpire = async (itemPks: Array<number>) => {
+  const deleteItemsBatch = [];
+  for (const itemPk of itemPks) {
+    const deleteItem = prisma.item.delete({
+      where: { id: itemPk },
+    });
+    deleteItemsBatch.push(deleteItem);
+  }
+  await prisma.$transaction(deleteItemsBatch);
+};
+
 export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
@@ -92,37 +131,18 @@ export default async function handle(
       }
       // delete item from prisma model
       const itemPks: Array<number> = req.body.ids;
-      const deleteItemsBatch = [];
-      for (const itemPk of itemPks) {
-        if (typeof itemPk !== "number") {
-          return res.status(400).json({ error: "Invalid item id." });
-        }
-        const deleteItem = prisma.item.delete({
-          where: { id: itemPk },
-        });
-        deleteItemsBatch.push(deleteItem);
-      }
-      await prisma.$transaction(deleteItemsBatch);
-      // remove items from waxpeer
+      const itemIds: Array<number> = req.body.itemIds;
+      const deleteAll: boolean = req.body.deleteAll;
       const settings = await prisma.settings.findUnique({
         where: {
           id: 1,
         },
       });
       const apiKey: string = settings?.waxpeerApiKey || "";
-      if (apiKey) {
-        let myHeaders = new Headers();
-        myHeaders.append("accept", "application/json");
-        let requestOptions = {
-          method: "GET",
-          headers: myHeaders,
-        };
-        let url = `https://api.waxpeer.com/v1/remove-items?api=${apiKey}`;
-        for (const id of itemPks) {
-          url += `&id=${id}`;
-        }
-        await fetch(url, requestOptions);
-      }
+      if (apiKey && !deleteAll && itemIds.length > 0)
+        deleteItemsFromWaxpeer(itemIds, apiKey);
+      else if (apiKey && deleteAll) deleteAllFromWaxpeer(apiKey);
+      await deleteItemsFromPriceEmpire(itemPks);
       return res.status(200).json({ message: "Item deleted." });
     }
   } catch (e: any) {

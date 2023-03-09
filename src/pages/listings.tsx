@@ -25,13 +25,16 @@ const Listings: React.FC<any> = ({ items }) => {
       const ids = deleteAll
         ? items.map((item: any) => item.id)
         : [deleteConfirmModalItem.id];
+      const itemIds = deleteAll
+        ? items.map((item: any) => item.item_id)
+        : [deleteConfirmModalItem.item_id];
       await fetch("/api/items", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({ ids }),
+        body: JSON.stringify({ ids, deleteAll, itemIds }),
       });
       message.success("Item deleted");
       setDeleteConfirmModalVisible(false);
