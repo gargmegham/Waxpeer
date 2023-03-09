@@ -25,10 +25,10 @@ const Login: React.FC = () => {
         return;
       }
       localStorage.setItem("token", data.token);
-      setLoading(false);
       await Router.push("/listings");
     } catch (error) {
       console.error(error);
+    } finally {
       setLoading(false);
     }
   };
@@ -53,7 +53,11 @@ const Login: React.FC = () => {
           value={password}
         />
         {loading ? (
-          <Spin />
+          <Spin
+            style={{
+              marginTop: "10px",
+            }}
+          />
         ) : (
           <input
             className={styles.cta}
