@@ -36,7 +36,7 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      body: JSON.stringify({ values }),
+      body: JSON.stringify({ values, items: inventory.items }),
     });
     message.success("Listing Settings updated!");
     setTimeout(() => {

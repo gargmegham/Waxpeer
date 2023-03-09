@@ -1,6 +1,29 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
 import { signingKey } from "@/constants";
+import { Item } from "@/types";
+
+async function getAllItemPrices(source: string) {
+  try {
+    const settings = await prisma.settings.findUnique({
+      where: {
+        id: 1,
+      },
+    });
+    const apiKey: string = settings?.priceEmpireApiKey || "";
+    let myHeaders = new Headers();
+    myHeaders.append("accept", "application/json");
+    let requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+    };
+    const uri = `https://pricempire.com/api/v3/getAllItems?api_key=${apiKey}&sources=${source}`;
+    const response = await fetch(uri, requestOptions);
+    return await response.json();
+  } catch (err) {
+    console.log("getting error from priceempire API", err);
+  }
+}
 
 // GET /api/listing
 export default async function handle(
@@ -26,11 +49,48 @@ export default async function handle(
           id: 1,
         },
         data: {
-          listItemFrom: Number(values.listItemFrom),
-          listItemTo: Number(values.listItemTo),
           noOfItemsRoListAtATime: Number(values.noOfItemsRoListAtATime),
         },
       });
+      const latestSourcePrices = await getAllItemPrices(
+        updatedSettings.source || "buff"
+      );
+      // fetch data from priceempire
+      const items: Array<Item> = req.body.items;
+      // create items in prisma model
+      const batchItems = [];
+      for (const item of items) {
+        if (
+          !latestSourcePrices ||
+          !latestSourcePrices[item.name] ||
+          !latestSourcePrices[item.name][updatedSettings.source] ||
+          !latestSourcePrices[item.name][updatedSettings.source].price ||
+          Number.isNaN(
+            Number(latestSourcePrices[item.name][updatedSettings.source].price)
+          ) ||
+          latestSourcePrices[item.name][updatedSettings.source].price / 100 >
+            values.listItemTo ||
+          latestSourcePrices[item.name][updatedSettings.source].price / 100 <
+            values.listItemFrom
+        )
+          continue;
+        const newItem = prisma.item.create({
+          data: {
+            name: item.name,
+            type: item.type,
+            item_id: String(item.item_id),
+            source: updatedSettings.source,
+            sourcePrice:
+              latestSourcePrices[item.name][updatedSettings.source].price / 100,
+            undercutPrice: updatedSettings.undercutPrice,
+            undercutPercentage: updatedSettings.undercutPercentage,
+            undercutByPriceOrPercentage:
+              updatedSettings.undercutByPriceOrPercentage,
+          },
+        });
+        batchItems.push(newItem);
+      }
+      await prisma.$transaction(batchItems);
       return res.status(200).json(updatedSettings);
     }
   } catch (e: any) {
