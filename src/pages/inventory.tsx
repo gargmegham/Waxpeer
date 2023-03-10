@@ -123,7 +123,7 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
               disabled={listing}
               onClick={() => setListingModal(true)}
             >
-              Listing Settings
+              List from range
             </Button>
             <Button
               type="primary"

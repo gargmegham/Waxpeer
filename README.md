@@ -26,4 +26,4 @@
   password = `Jackson Wei`
   username = `admin`
 - Define appropriate settings
-- In inventory click `Add All` and then click 'Listing Settings' to define appropriate listing range
+- In inventory click `Add All`, 'Add Selected' or 'List from range' to add items to listings
