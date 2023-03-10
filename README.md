@@ -18,7 +18,7 @@
 
 # Code Sharing
 
-- Remove schema.prisma file before sharing code with others
+- Remove url from schema.prisma file before sharing code with others
 
 # How to use
 
