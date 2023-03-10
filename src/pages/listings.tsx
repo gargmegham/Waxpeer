@@ -70,11 +70,6 @@ const Listings: React.FC<any> = ({ items }) => {
           onChange={(e) => setSearch(e.target.value)}
         />
         <Table
-          pagination={{
-            pageSize: 50,
-            showSizeChanger: true,
-            pageSizeOptions: ["50", "100"],
-          }}
           dataSource={items
             .filter(
               (item: any) =>

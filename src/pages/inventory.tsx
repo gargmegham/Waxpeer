@@ -154,11 +154,6 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
           onChange={(e) => setSearch(e.target.value)}
         />
         <Table
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50", "100"],
-          }}
           rowSelection={{
             type: "checkbox",
             ...rowSelection,
