@@ -4,6 +4,7 @@ import { GetServerSideProps } from "next";
 import {
   Table,
   Spin,
+  Select,
   InputNumber,
   Form,
   Card,
@@ -49,6 +50,10 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
       setListing(false);
     }
   };
+
+  React.useEffect(() => {
+    fetch(`/api/activatebot`);
+  }, []);
 
   React.useEffect(() => {
     const fetchInventory = async () => {
@@ -195,6 +200,9 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
           footer={null}
         >
           <Form
+            style={{
+              padding: "10px",
+            }}
             name="listing-settings"
             layout="vertical"
             onFinish={saveListingSettings}
@@ -223,6 +231,35 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
               ]}
             >
               <InputNumber min={0} />
+            </Form.Item>
+            <Form.Item
+              label="Listing Percentage"
+              name="listingPercentage"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select a value!",
+                },
+              ]}
+            >
+              <InputNumber min={100} />
+            </Form.Item>
+            <Form.Item
+              label="List Using"
+              name="listUsing"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select a value!",
+                },
+              ]}
+            >
+              <Select>
+                <Select.Option value="price-range">Price Range</Select.Option>
+                <Select.Option value="list-percentage">
+                  List Percentage
+                </Select.Option>
+              </Select>
             </Form.Item>
             <Form.Item
               label="How Many Items To List At A Time"

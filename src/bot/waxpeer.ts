@@ -67,24 +67,29 @@ export async function waxPeerBot() {
       );
       let newPrice = 0;
 
-      //if any item within price range
-      if (itemsWithinPriceRange.length > 0) {
-        const minPriceFromRange = Math.min(
-          ...itemsWithinPriceRange.map(
-            (item: WaxPeerSearchItemResult) => item.price / 1000
-          )
-        );
-        newPrice =
-          itemToBeTraded.undercutByPriceOrPercentage === "percentage"
-            ? (minPriceFromRange * (100 - itemToBeTraded.undercutPercentage)) /
-              100
-            : minPriceFromRange - itemToBeTraded.undercutPrice;
+      if (itemToBeTraded.listUsing === "price-range") {
+        //if any item within price range
+        if (itemsWithinPriceRange.length > 0) {
+          const minPriceFromRange = Math.min(
+            ...itemsWithinPriceRange.map(
+              (item: WaxPeerSearchItemResult) => item.price / 1000
+            )
+          );
+          newPrice =
+            itemToBeTraded.undercutByPriceOrPercentage === "percentage"
+              ? (minPriceFromRange *
+                  (100 - itemToBeTraded.undercutPercentage)) /
+                100
+              : minPriceFromRange - itemToBeTraded.undercutPrice;
+        } else {
+          //if there are no items in price range
+          newPrice =
+            itemToBeTraded.whenNoOneToUndercutListUsing === "percentage"
+              ? sourcePrice * (itemToBeTraded.priceRangePercentage / 100)
+              : itemToBeTraded.priceRangeMax;
+        }
       } else {
-        //if there are no items in price range
-        newPrice =
-          itemToBeTraded.whenNoOneToUndercutListUsing === "percentage"
-            ? sourcePrice * (itemToBeTraded.priceRangePercentage / 100)
-            : itemToBeTraded.priceRangeMax;
+        newPrice = sourcePrice * (itemToBeTraded.listingPercentage / 100);
       }
       const currentItem = searchedItems.find(
         (item: WaxPeerSearchItemResult) =>

@@ -44,6 +44,8 @@ export type ItemInDb = {
   message: string;
   floatCondition: number | null;
   currentPrice: number;
+  listingPercentage: number;
+  listUsing: string;
 };
 
 export type Item = {

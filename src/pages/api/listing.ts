@@ -86,6 +86,8 @@ export default async function handle(
             undercutPercentage: updatedSettings.undercutPercentage,
             undercutByPriceOrPercentage:
               updatedSettings.undercutByPriceOrPercentage,
+            listUsing: values.listUsing,
+            listingPercentage: Number(values.listingPercentage),
           },
         });
         batchItems.push(newItem);
