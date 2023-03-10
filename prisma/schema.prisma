@@ -33,6 +33,8 @@ model Settings {
   paused Boolean @default(false)
   priceRange PriceRange[]
   noOfItemsRoListAtATime Int @default(100)
+  listingPercentage Int @default(100)
+  listUsing String @default("price-range") //price-range or list-percentage
 }
 
 model PriceRange{

@@ -32,8 +32,8 @@
   ```
   ```
   INSERT INTO public."Settings"
-  (id, "userId", "waxpeerApiKey", "waxpeerRateLimit", "priceEmpireApiKey", "priceEmpireRateLimit", "source", "undercutPrice", "undercutPercentage", "undercutByPriceOrPercentage", paused, "noOfItemsRoListAtATime", "floatBotFrequency")
-  VALUES(1, 1, 'xyz...', 1, 'zyx...', 1, 'buff', 0.1, 1.0, 'price', false, 50, 30);
+  (id, "userId", "waxpeerApiKey", "waxpeerRateLimit", "priceEmpireApiKey", "priceEmpireRateLimit", "source", "undercutPrice", "undercutPercentage", "undercutByPriceOrPercentage", paused, "noOfItemsRoListAtATime", "floatBotFrequency", "listingPercentage", "listUsing")
+  VALUES(1, 1, 'xyz...', 1, 'zyx...', 1, 'buff', 0.1, 1.0, 'price', false, 50, 30, 100, 'price-range');
   ```
 
 # How to use
