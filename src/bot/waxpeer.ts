@@ -47,12 +47,13 @@ export async function waxPeerBot() {
     for (const itemToBeTraded of itemsNeedTobeTraded) {
       if (
         !itemToBeTraded.sourcePrice ||
-        !itemToBeTraded.priceRangeMin ||
-        !itemToBeTraded.priceRangeMax ||
-        !itemToBeTraded.priceRangePercentage ||
-        !itemToBeTraded.whenNoOneToUndercutListUsing
+        ((!itemToBeTraded.priceRangeMin ||
+          !itemToBeTraded.priceRangeMax ||
+          !itemToBeTraded.priceRangePercentage ||
+          !itemToBeTraded.whenNoOneToUndercutListUsing) &&
+          itemToBeTraded.listUsing === "price-range")
       ) {
-        console.log("itemToBeTraded has some data missing, skipping..");
+        console.log("itemToBeTraded has some data missing, skipping...");
         continue;
       }
       const sourcePrice: number = itemToBeTraded.sourcePrice;
