@@ -32,14 +32,7 @@ const deleteAllFromWaxpeer = async (apiKey: string) => {
 };
 
 const deleteItemsFromPrisma = async (itemPks: Array<number>) => {
-  const deleteItemsBatch = [];
-  for (const itemPk of itemPks) {
-    const deleteItem = prisma.item.delete({
-      where: { id: itemPk },
-    });
-    deleteItemsBatch.push(deleteItem);
-  }
-  await prisma.$transaction(deleteItemsBatch);
+  await prisma.item.deleteMany({});
 };
 
 export default async function handle(
