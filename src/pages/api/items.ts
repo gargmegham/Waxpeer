@@ -31,8 +31,21 @@ const deleteAllFromWaxpeer = async (apiKey: string) => {
   await res.json();
 };
 
-const deleteItemsFromPrisma = async (itemPks: Array<number>) => {
-  await prisma.item.deleteMany({});
+const deleteItemsFromPrisma = async (itemPks: Array<number>, deleteAll: boolean) => {
+  if (deleteAll) {
+    await prisma.item.deleteMany({});
+    return;
+  }
+  const deleteItemsFromPrisma = async (itemPks: Array<number>) => {
+  const deleteItemsBatch = [];
+  for (const itemPk of itemPks) {
+    const deleteItem = prisma.item.delete({
+      where: { id: itemPk },
+    });
+    deleteItemsBatch.push(deleteItem);
+  }
+  await prisma.$transaction(deleteItemsBatch);
+};
 };
 
 export default async function handle(
@@ -135,7 +148,7 @@ export default async function handle(
       if (apiKey && !deleteAll && itemIds.length > 0)
         deleteItemsFromWaxpeer(itemIds, apiKey);
       else if (apiKey && deleteAll) deleteAllFromWaxpeer(apiKey);
-      await deleteItemsFromPrisma(itemPks);
+      await deleteItemsFromPrisma(itemPks, deleteAll);
       return res.status(200).json({ message: "Item deleted." });
     }
   } catch (e: any) {
