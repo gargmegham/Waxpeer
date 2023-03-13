@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
 import { signingKey } from "@/constants";
+import { updateFloat } from "@/bot/updatefloat";
 import { Item } from "@/types";
 
 async function getAllItemPrices(source: string) {
@@ -94,7 +95,7 @@ export default async function handle(
       }
       await prisma.$transaction(batchItems);
       return res.status(200).json(updatedSettings);
-    }
+    } else if (req.method === "GET") updateFloat();
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }

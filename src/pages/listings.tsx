@@ -7,7 +7,6 @@ import DeleteOutlined from "@ant-design/icons/DeleteOutlined";
 import { GetServerSideProps } from "next";
 import EditItemModal from "@/components/EditItemModal";
 import { CheckCircleTwoTone, StopTwoTone } from "@ant-design/icons";
-import { updateFloat } from "@/bot/updatefloat";
 
 const Listings: React.FC<any> = ({ items }) => {
   const [search, setSearch] = React.useState<string>("");
@@ -48,7 +47,7 @@ const Listings: React.FC<any> = ({ items }) => {
   };
 
   useEffect(() => {
-    updateFloat();
+    fetch("/api/listing");
   }, []);
 
   return (
