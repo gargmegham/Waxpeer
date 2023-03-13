@@ -95,7 +95,10 @@ export default async function handle(
       }
       await prisma.$transaction(batchItems);
       return res.status(200).json(updatedSettings);
-    } else if (req.method === "GET") updateFloat();
+    } else if (req.method === "GET") {
+      updateFloat();
+      return res.status(200).json({});
+    }
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }
