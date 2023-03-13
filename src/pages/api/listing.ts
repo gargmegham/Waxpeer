@@ -3,8 +3,10 @@ import prisma from "@/lib/prisma";
 import { signingKey } from "@/constants";
 import { updateFloat } from "@/bot/updatefloat";
 import { Item } from "@/types";
+import mockedData from "../../../mockedData";
 
 async function getAllItemPrices(source: string) {
+  return mockedData;
   try {
     const settings = await prisma.settings.findUnique({
       where: {

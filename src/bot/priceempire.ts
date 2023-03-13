@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import mockedData from "../../mockedData";
 
 import prisma from "@/lib/prisma";
 import { ItemInDb } from "@/types";
@@ -148,6 +149,7 @@ export async function priceEmpireBot() {
 }
 
 async function getAllItemPrices(source: string) {
+  return mockedData;
   try {
     const settings = await prisma.settings.findUnique({
       where: {
