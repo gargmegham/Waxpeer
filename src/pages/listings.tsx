@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Table, Input, Modal, message, InputNumber, Card, Button } from "antd";
 import Layout from "@/components/Layout";
 import prisma from "@/lib/prisma";
@@ -7,6 +7,7 @@ import DeleteOutlined from "@ant-design/icons/DeleteOutlined";
 import { GetServerSideProps } from "next";
 import EditItemModal from "@/components/EditItemModal";
 import { CheckCircleTwoTone, StopTwoTone } from "@ant-design/icons";
+import { updateFloat } from "@/bot/updatefloat";
 
 const Listings: React.FC<any> = ({ items }) => {
   const [search, setSearch] = React.useState<string>("");
@@ -45,6 +46,10 @@ const Listings: React.FC<any> = ({ items }) => {
       setDeleting(false);
     }
   };
+
+  useEffect(() => {
+    updateFloat();
+  }, []);
 
   return (
     <Layout>
