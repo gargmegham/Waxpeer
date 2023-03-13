@@ -323,6 +323,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
       priceRangeMin: true,
       botSuccess: true,
       floatCondition: true,
+      listingPercentage: true,
+      listUsing: true,
       message: true,
       priceRangeMax: true,
       priceRangePercentage: true,

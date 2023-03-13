@@ -31,12 +31,14 @@ const deleteAllFromWaxpeer = async (apiKey: string) => {
   await res.json();
 };
 
-const deleteItemsFromPrisma = async (itemPks: Array<number>, deleteAll: boolean) => {
+const deleteItemsFromPrisma = async (
+  itemPks: Array<number>,
+  deleteAll: boolean
+) => {
   if (deleteAll) {
     await prisma.item.deleteMany({});
     return;
   }
-  const deleteItemsFromPrisma = async (itemPks: Array<number>) => {
   const deleteItemsBatch = [];
   for (const itemPk of itemPks) {
     const deleteItem = prisma.item.delete({
@@ -45,7 +47,6 @@ const deleteItemsFromPrisma = async (itemPks: Array<number>, deleteAll: boolean)
     deleteItemsBatch.push(deleteItem);
   }
   await prisma.$transaction(deleteItemsBatch);
-};
 };
 
 export default async function handle(
@@ -121,6 +122,8 @@ export default async function handle(
           priceRangeMax: item.priceRangeMax,
           priceRangePercentage: item.priceRangePercentage,
           whenNoOneToUndercutListUsing: item.whenNoOneToUndercutListUsing,
+          listingPercentage: item.listingPercentage,
+          listUsing: item.listUsing,
         },
       });
       return res.status(200).json({ updatedItem, message: "Item updated." });

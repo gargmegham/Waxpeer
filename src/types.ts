@@ -23,6 +23,8 @@ export type SelectedItem = {
   priceRangeMax: number;
   priceRangePercentage: number;
   whenNoOneToUndercutListUsing: string;
+  listingPercentage: number;
+  listUsing: string;
 };
 
 export type ItemInDb = {

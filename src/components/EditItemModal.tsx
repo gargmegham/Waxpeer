@@ -3,7 +3,6 @@ import {
   InputNumber,
   Switch,
   Button,
-  Spin,
   Row,
   message,
   Col,
@@ -249,6 +248,52 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                   }}
                   unCheckedChildren="Percentage"
                   checkedChildren="Max"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[32, 32]}>
+            <Col span={8}>
+              <Form.Item
+                label="List At %"
+                name="listingPercentage"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input price range min!",
+                  },
+                ]}
+              >
+                <InputNumber
+                  defaultValue={inputs.listingPercentage}
+                  formatter={(value) => `${value}%`}
+                  onChange={(e) => {
+                    inputs.listingPercentage = Number(e);
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label="List Using"
+                name="listUsing"
+                rules={[
+                  {
+                    required: true,
+                    message:
+                      "Please select whether to use price range or listing %",
+                  },
+                ]}
+              >
+                <Switch
+                  defaultChecked={inputs.listUsing === "price-range"}
+                  onChange={(checked) => {
+                    inputs.listUsing = checked
+                      ? "price-range"
+                      : "list-percentage";
+                  }}
+                  unCheckedChildren="List Percentage"
+                  checkedChildren="Price Range"
                 />
               </Form.Item>
             </Col>
