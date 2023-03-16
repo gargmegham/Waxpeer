@@ -167,7 +167,7 @@ const Listings: React.FC<any> = ({ items }) => {
               title: "Source Price",
               dataIndex: "sourcePrice",
               sortDirections: ["descend", "ascend"],
-              sorter: (a: any, b: any) => a.item_id - b.item_id,
+              sorter: (a: any, b: any) => a.sourcePrice - b.sourcePrice,
               render: (sourcePrice: number) => {
                 return (
                   <InputNumber
@@ -189,7 +189,7 @@ const Listings: React.FC<any> = ({ items }) => {
               title: "Current Price",
               dataIndex: "currentPrice",
               sortDirections: ["descend", "ascend"],
-              sorter: (a: any, b: any) => a.item_id - b.item_id,
+              sorter: (a: any, b: any) => a.currentPrice - b.currentPrice,
               render: (sourcePrice: number) => {
                 return (
                   <InputNumber
@@ -212,7 +212,7 @@ const Listings: React.FC<any> = ({ items }) => {
               dataIndex: "priceRangeMin",
               width: 100,
               sortDirections: ["descend", "ascend"],
-              sorter: (a: any, b: any) => a.item_id - b.item_id,
+              sorter: (a: any, b: any) => a.priceRangeMin - b.priceRangeMin,
               render: (priceRangeMin: number, record: any) => {
                 return (
                   <InputNumber
@@ -234,7 +234,7 @@ const Listings: React.FC<any> = ({ items }) => {
               width: 100,
               dataIndex: "priceRangeMax",
               sortDirections: ["descend", "ascend"],
-              sorter: (a: any, b: any) => a.item_id - b.item_id,
+              sorter: (a: any, b: any) => a.priceRangeMax - b.priceRangeMax,
               render: (priceRangeMax: number, record: any) => {
                 return (
                   <InputNumber
@@ -256,7 +256,7 @@ const Listings: React.FC<any> = ({ items }) => {
               width: 100,
               dataIndex: "pricePercentage",
               sortDirections: ["descend", "ascend"],
-              sorter: (a: any, b: any) => a.item_id - b.item_id,
+              sorter: (a: any, b: any) => a.pricePercentage - b.pricePercentage,
               render: (pricePercentage: number, record: any) => {
                 return (
                   <InputNumber
