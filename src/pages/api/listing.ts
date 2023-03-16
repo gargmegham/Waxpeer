@@ -44,6 +44,8 @@ export default async function handle(
       }
       //   update settings
       const values = req.body.values;
+      if (values.listUsing !== "price-range" && !values.listingPercentage)
+        return res.status(400).json({ error: "Listing Percentage missing!" });
       const updatedSettings = await prisma.settings.update({
         where: {
           id: 1,
@@ -87,7 +89,9 @@ export default async function handle(
             undercutByPriceOrPercentage:
               updatedSettings.undercutByPriceOrPercentage,
             listUsing: values.listUsing,
-            listingPercentage: Number(values.listingPercentage),
+            listingPercentage: values.listingPercentage
+              ? Number(values.listingPercentage)
+              : 0,
           },
         });
         batchItems.push(newItem);
