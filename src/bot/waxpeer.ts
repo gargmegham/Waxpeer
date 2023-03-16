@@ -82,7 +82,10 @@ export async function waxPeerBot() {
                   (100 - itemToBeTraded.undercutPercentage)) /
                 100
               : minPriceFromRange - itemToBeTraded.undercutPrice;
-        } else {
+        } else if (
+          itemToBeTraded.priceRangePercentage &&
+          itemToBeTraded.priceRangeMax
+        ) {
           //if there are no items in price range
           newPrice =
             itemToBeTraded.whenNoOneToUndercutListUsing === "percentage"
@@ -133,14 +136,16 @@ export async function waxPeerBot() {
         botSuccess: true,
       },
     });
-    if (updateItemPrice.length)
+    if (updateItemPrice.length) {
       // update items price in batch of maxItemsToUpdate
       for (let i = 0; i < updateItemPrice.length; i += maxItemsToUpdate)
         await updateItemPricesOnWaxPeer(
           updateItemPrice.slice(i, i + maxItemsToUpdate)
         );
-    if (listItems.length)
+    }
+    if (listItems.length) {
       listItemsOnWaxPeer(listItems.slice(0, maxItemsToList));
+    }
   } catch (err) {
     console.log("error in updating bot status", err);
   }

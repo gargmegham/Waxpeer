@@ -172,22 +172,16 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
               title: "Item",
               dataIndex: "item_id",
               key: "item_id",
-              sortDirections: ["descend", "ascend"],
-              sorter: (a: Item, b: Item) => a.item_id - b.item_id,
             },
             {
               title: "Name",
               dataIndex: "name",
               defaultSortOrder: "descend",
-              sortDirections: ["descend", "ascend"],
-              sorter: (a: Item, b: Item) => a.name.localeCompare(b.name),
             },
             {
               title: "Type",
               dataIndex: "type",
               defaultSortOrder: "descend",
-              sortDirections: ["descend", "ascend"],
-              sorter: (a: Item, b: Item) => a.type.localeCompare(b.type),
             },
           ]}
         />
@@ -233,18 +227,6 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
               <InputNumber min={0} />
             </Form.Item>
             <Form.Item
-              label="Listing Percentage"
-              name="listingPercentage"
-              rules={[
-                {
-                  required: true,
-                  message: "Please select a value!",
-                },
-              ]}
-            >
-              <InputNumber min={100} />
-            </Form.Item>
-            <Form.Item
               label="List Using"
               name="listUsing"
               rules={[
@@ -260,6 +242,9 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
                   List Percentage
                 </Select.Option>
               </Select>
+            </Form.Item>
+            <Form.Item label="Listing Percentage" name="listingPercentage">
+              <InputNumber min={100} />
             </Form.Item>
             <Form.Item
               label="How Many Items To List At A Time"

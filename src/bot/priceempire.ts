@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import prisma from "@/lib/prisma";
+import { updateFloat } from "@/bot/updatefloat";
 import { ItemInDb } from "@/types";
 
 dayjs.extend(relativeTime);
@@ -142,6 +143,7 @@ export async function priceEmpireBot() {
     );
     await prisma.$transaction(updateBatch);
     console.log("price empire bot completed");
+    updateFloat();
   } catch (err) {
     console.log("error during updating from priceempire", err);
   }

@@ -41,7 +41,7 @@ export async function updateFloat() {
     const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
     let updateItems: Array<PrimsaUpdateArgumnt> = [];
     for (const itemToTrade of itemsNeedTobeTraded) {
-      const items = await getFloat(itemToTrade.name);
+      const items = await getFloat(itemToTrade.name, itemToTrade.item_id);
       if (items.length > 0)
         updateItems.push({
           where: {
@@ -60,7 +60,7 @@ export async function updateFloat() {
   }
 }
 
-async function getFloat(itemName: string) {
+async function getFloat(itemName: string, item_id: string | number) {
   try {
     const settings = await prisma.settings.findUnique({
       where: {
@@ -79,7 +79,7 @@ async function getFloat(itemName: string) {
       requestOptions
     );
     const { items } = await response.json();
-    return items;
+    return items.filter((item: any) => item.item_id == item_id);
   } catch (err) {
     console.log("getting float error");
   }

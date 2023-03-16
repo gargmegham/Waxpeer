@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Table, Input, Modal, message, InputNumber, Card, Button } from "antd";
 import Layout from "@/components/Layout";
 import prisma from "@/lib/prisma";
@@ -45,10 +45,6 @@ const Listings: React.FC<any> = ({ items }) => {
       setDeleting(false);
     }
   };
-
-  useEffect(() => {
-    fetch("/api/listing");
-  }, []);
 
   return (
     <Layout>

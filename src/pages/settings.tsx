@@ -329,7 +329,22 @@ const Settings: React.FC<any> = ({ settings }) => {
               ),
             },
             {
-              title: "Price Range Percentage",
+              title: "Price Range Max Percentage",
+              dataIndex: "priceRangePercentage",
+              render: (text: any, record: any) => (
+                <InputNumber
+                  min={0}
+                  disabled={true}
+                  size="large"
+                  defaultValue={record.priceRangePercentage}
+                  formatter={(value) => `${value}%`}
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              ),
+            },
+            {
+              title: "Price Range Max Percentage",
               dataIndex: "priceRangePercentage",
               render: (text: any, record: any) => (
                 <InputNumber
