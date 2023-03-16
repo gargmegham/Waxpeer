@@ -7,9 +7,9 @@ import { WaxPeerSearchItemResult, UpdatedItemsType, ItemInDb } from "@/types";
 dayjs.extend(relativeTime);
 
 export async function waxPeerBot() {
-  console.log("waxpeer bot running");
   try {
-    const botLastRun = await prisma.user.findUnique({
+    console.log("waxpeer running...");
+    const user = await prisma.user.findUnique({
       where: {
         username: "admin",
       },
@@ -25,14 +25,14 @@ export async function waxPeerBot() {
     if (settings?.paused) return;
     if (!settings) return;
 
-    //do not run bot if last run from now is less than wait time
+    //do not run if last run from now is less than wait time
     if (
-      botLastRun &&
-      botLastRun.botLastRun &&
-      dayjs(new Date()).diff(new Date(botLastRun.botLastRun), "minute") <
+      user &&
+      user.botLastRun &&
+      dayjs(new Date()).diff(new Date(user.botLastRun), "minute") <
         maxBotWaitLimit
     ) {
-      console.log("waxpeer bot waiting...");
+      console.log("waxpeer waiting...");
       return;
     }
 
@@ -62,8 +62,22 @@ export async function waxPeerBot() {
         (item: WaxPeerSearchItemResult) =>
           itemToBeTraded.priceRangeMin &&
           itemToBeTraded.priceRangeMax &&
-          itemToBeTraded.priceRangeMin <= item.price / 1000 &&
-          item.price / 1000 < itemToBeTraded.priceRangeMax &&
+          itemToBeTraded.priceRangeMin <=
+            (item.price -
+              (itemToBeTraded.listUsing === "price-range"
+                ? itemToBeTraded.undercutByPriceOrPercentage === "percentage"
+                  ? itemToBeTraded.undercutPercentage * sourcePrice
+                  : itemToBeTraded.undercutPrice
+                : 0)) /
+              1000 &&
+          (item.price -
+            (itemToBeTraded.listUsing === "price-range"
+              ? itemToBeTraded.undercutByPriceOrPercentage === "percentage"
+                ? itemToBeTraded.undercutPercentage * sourcePrice
+                : itemToBeTraded.undercutPrice
+              : 0)) /
+            1000 <
+            itemToBeTraded.priceRangeMax &&
           item.item_id !== itemToBeTraded.item_id
       );
       let newPrice = 0;
@@ -115,7 +129,6 @@ export async function waxPeerBot() {
       itemToBeTraded.currentPrice = newPrice;
       itemsUpdated.push(itemToBeTraded);
     }
-    //update bot last run
     await prisma.user.update({
       where: {
         username: "admin",
@@ -124,7 +137,6 @@ export async function waxPeerBot() {
         botLastRun: new Date(),
       },
     });
-    // update bot run status
     await prisma.item.updateMany({
       where: {
         id: {
@@ -146,8 +158,9 @@ export async function waxPeerBot() {
     if (listItems.length) {
       listItemsOnWaxPeer(listItems.slice(0, maxItemsToList));
     }
+    console.log("waxpeer completed");
   } catch (err) {
-    console.log("error in updating bot status", err);
+    console.error("error in waxpeer!", err);
   }
 }
 
@@ -219,7 +232,7 @@ async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
       )
     );
   } catch (err) {
-    console.log("error while listing items", err);
+    console.error("error while listing items!", err);
   }
 }
 
@@ -269,6 +282,6 @@ async function updateItemPricesOnWaxPeer(items: Array<UpdatedItemsType>) {
       )
     );
   } catch (err) {
-    console.log("error while updating prices on wax peer");
+    console.error("error while updating prices on waxpeer!");
   }
 }

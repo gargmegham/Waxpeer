@@ -2,45 +2,48 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import prisma from "@/lib/prisma";
-import { updateFloat } from "@/bot/updatefloat";
 import { ItemInDb } from "@/types";
 
 dayjs.extend(relativeTime);
 
 export async function priceEmpireBot() {
-  console.log("price empire  bot running");
   try {
+    console.log("priceempire running...");
+
     const settings = await prisma.settings.findUnique({
       where: { id: 1 },
       include: { priceRange: true },
     });
+
     if (!settings || !Object.values(settings).length) return;
     if (settings?.paused) {
-      console.log("price empire bot paused");
+      console.log("priceempire paused");
       return;
     }
 
-    const maxBotWaitLimit = settings?.priceEmpireRateLimit || 1;
-    const botLastRun = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         username: "admin",
       },
     });
+    const maxBotWaitLimit = settings?.priceEmpireRateLimit || 1;
+
     if (
-      botLastRun &&
-      botLastRun.priceEmpireLastRun &&
-      dayjs(new Date()).diff(
-        new Date(botLastRun.priceEmpireLastRun),
-        "minute"
-      ) < maxBotWaitLimit
+      user &&
+      user.priceEmpireLastRun &&
+      dayjs(new Date()).diff(new Date(user.priceEmpireLastRun), "minute") <
+        maxBotWaitLimit
     ) {
-      console.log("price empire bot waiting");
+      console.log("priceempire waiting");
       return;
     }
+
     const itemsTobeUpdated: Array<ItemInDb> = await prisma.item.findMany();
+
     const latestSourcePrices = await getAllItemPrices(
       settings.source || "buff"
     );
+
     const updateBatch = [];
     itemsTobeUpdated.map((itemToBeTraded: ItemInDb) => {
       //if the source price cannot be fetched then update the item status with Cannot fetch source price
@@ -92,6 +95,7 @@ export async function priceEmpireBot() {
           return;
         }
       });
+      // update price range related data
       if (!foundAtLeastOnePriceRange) {
         updateBatch.push(
           prisma.item.update({
@@ -110,7 +114,7 @@ export async function priceEmpireBot() {
         );
         console.log("cannot find price range for this item");
         return;
-      } else
+      } else {
         updateBatch.push(
           prisma.item.update({
             where: {
@@ -130,6 +134,7 @@ export async function priceEmpireBot() {
             },
           })
         );
+      }
     });
     updateBatch.push(
       prisma.user.update({
@@ -142,10 +147,9 @@ export async function priceEmpireBot() {
       })
     );
     await prisma.$transaction(updateBatch);
-    console.log("price empire bot completed");
-    updateFloat();
+    console.log("priceempire  completed");
   } catch (err) {
-    console.log("error during updating from priceempire", err);
+    console.error("error during updating from priceempire!", err);
   }
 }
 
@@ -167,6 +171,6 @@ async function getAllItemPrices(source: string) {
     const response = await fetch(uri, requestOptions);
     return await response.json();
   } catch (err) {
-    console.log("getting error from priceempire API", err);
+    console.error("getting error from priceempire API!", err);
   }
 }

@@ -21,7 +21,7 @@ async function getAllItemPrices(source: string) {
     const response = await fetch(uri, requestOptions);
     return await response.json();
   } catch (err) {
-    console.log("getting error from priceempire API", err);
+    console.error("getting error from priceempire API!", err);
   }
 }
 

@@ -155,7 +155,6 @@ export default async function handle(
       return res.status(200).json({ message: "Item deleted." });
     }
   } catch (e: any) {
-    console.error(e);
     res.status(500).json({ error: e.message });
   }
 }

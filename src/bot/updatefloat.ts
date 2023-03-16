@@ -7,8 +7,8 @@ import { ItemInDb, PrimsaUpdateArgumnt } from "@/types";
 dayjs.extend(relativeTime);
 
 export async function updateFloat() {
-  console.log("float bot running");
   try {
+    console.log("float updating...");
     const floatBotLastRun = await prisma.user.findUnique({
       where: {
         username: "admin",
@@ -25,7 +25,7 @@ export async function updateFloat() {
     if (settings?.paused) return;
     if (!settings) return;
 
-    //do not run bot if last run from now is less than wait time
+    //do not run if last run from now is less than wait time
     if (
       floatBotLastRun &&
       floatBotLastRun.floatBotLastRun &&
@@ -34,7 +34,7 @@ export async function updateFloat() {
         "minute"
       ) < maxBotWaitLimit
     ) {
-      console.log("float bot waiting...");
+      console.log("float waiting...");
       return;
     }
 
@@ -55,8 +55,9 @@ export async function updateFloat() {
     await prisma.$transaction(
       updateItems.map((item) => prisma.item.update(item))
     );
+    console.log("float updated!");
   } catch (err) {
-    console.log("update float bot error", err);
+    console.error("float updation error!", err);
   }
 }
 
@@ -79,8 +80,10 @@ async function getFloat(itemName: string, item_id: string | number) {
       requestOptions
     );
     const { items } = await response.json();
-    return items.filter((item: any) => item.item_id == item_id);
+    return items.filter(
+      (item: any) => String(item.item_id) === String(item_id)
+    );
   } catch (err) {
-    console.log("getting float error");
+    console.error("getting float error!");
   }
 }
