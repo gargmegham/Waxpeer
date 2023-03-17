@@ -33,7 +33,7 @@ export default async function handle(
     // create a jwt for user
     const jwt = require("jsonwebtoken");
     const token = jwt.sign({ username }, signingKey, {
-      expiresIn: "1h",
+      expiresIn: "6h",
     });
     return res.status(201).json({ token });
   } catch (e: any) {

@@ -344,21 +344,6 @@ const Settings: React.FC<any> = ({ settings }) => {
               ),
             },
             {
-              title: "Price Range Max Percentage",
-              dataIndex: "priceRangePercentage",
-              render: (text: any, record: any) => (
-                <InputNumber
-                  min={0}
-                  disabled={true}
-                  size="large"
-                  defaultValue={record.priceRangePercentage}
-                  formatter={(value) => `${value}%`}
-                  // @ts-ignore
-                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
-                />
-              ),
-            },
-            {
               title: "When No One To Undercut",
               dataIndex: "whenNoOneToUndercutListUsing",
               render: (text: any, record: any) => (
