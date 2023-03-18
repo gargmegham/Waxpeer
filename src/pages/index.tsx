@@ -61,7 +61,7 @@ const Login: React.FC<LoginProps> = ({ signup }) => {
         {loading ? (
           <Spin
             style={{
-              marginTop: "10px",
+              marginTop: "20px",
             }}
           />
         ) : (
