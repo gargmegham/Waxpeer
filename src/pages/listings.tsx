@@ -37,7 +37,7 @@ const Listings: React.FC<any> = ({ items }) => {
         },
         body: JSON.stringify({ ids, deleteAll, itemIds }),
       });
-      message.success("Item deleted");
+      message.success(deleteAll ? "All Items deleted!" : "Item deleted!");
       setDeleteConfirmModalVisible(false);
       setTimeout(() => {
         window.location.reload();
