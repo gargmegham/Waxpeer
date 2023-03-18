@@ -214,12 +214,20 @@ const Settings: React.FC<any> = ({ settings }) => {
                 <InputNumber disabled={!editMode} />
               </Form.Item>
             </Col>
-            <Col span={4}>WaxPeer API Frequency (In Minute)</Col>
+            <Col span={4}>WaxPeer Listing Frequency (In Minutes)</Col>
             <Col span={4}>
-              <Form.Item name="waxpeerRateLimit">
+              <Form.Item name="waxpeerRateLimitList">
                 <InputNumber disabled={!editMode} />
               </Form.Item>
             </Col>
+            <Col span={4}>WaxPeer Update Frequency (In Minutes)</Col>
+            <Col span={4}>
+              <Form.Item name="waxpeerRateLimitUpdate">
+                <InputNumber disabled={!editMode} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row style={{ marginBottom: "20px", fontSize: "26px" }}>
             <Col span={4}>PriceEmpire API Frequency (In Minutes)</Col>
             <Col span={4}>
               <Form.Item name="priceEmpireRateLimit">

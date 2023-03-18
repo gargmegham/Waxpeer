@@ -20,27 +20,14 @@ export async function waxPeerBot() {
       include: { priceRange: true },
     });
 
-    const maxBotWaitLimit = settings?.waxpeerRateLimit || 1;
-
     if (settings?.paused) return;
     if (!settings) return;
 
-    //do not run if last run from now is less than wait time
-    if (
-      user &&
-      user.botLastRun &&
-      dayjs(new Date()).diff(new Date(user.botLastRun), "minute") <
-        maxBotWaitLimit
-    ) {
-      console.log("waxpeer waiting...");
-      return;
-    }
-
     const itemsNeedTobeTraded: Array<ItemInDb> = await prisma.item.findMany();
+
     let updateItemPrice: Array<UpdatedItemsType> = [];
     let listItems: Array<UpdatedItemsType> = [];
     let itemsUpdated: Array<ItemInDb> = [];
-    const maxItemsToUpdate = 50;
     const maxItemsToList = settings.noOfItemsRoListAtATime;
 
     //do not change this loop to forEach or map there is synchronous issue
@@ -57,7 +44,10 @@ export async function waxPeerBot() {
         continue;
       }
       const sourcePrice: number = itemToBeTraded.sourcePrice;
-      const searchedItems = await searchItemsInWaxPeer(itemToBeTraded.name);
+      const searchedItems = await searchItemsInWaxPeer(
+        itemToBeTraded.name,
+        settings
+      );
       const itemsWithinPriceRange = searchedItems.filter(
         (item: WaxPeerSearchItemResult) =>
           itemToBeTraded.priceRangeMin &&
@@ -138,47 +128,52 @@ export async function waxPeerBot() {
       itemToBeTraded.currentPrice = newPrice;
       itemsUpdated.push(itemToBeTraded);
     }
-    await prisma.user.update({
-      where: {
-        username: "admin",
-      },
-      data: {
-        botLastRun: new Date(),
-      },
-    });
-    await prisma.item.updateMany({
-      where: {
-        id: {
-          in: itemsUpdated.map((item) => item.id),
+    //do not run if last run from now is less than wait time
+    const maxBotWaitLimitUpdate = settings?.waxpeerRateLimitUpdate || 1;
+    if (
+      user &&
+      user.waxpeerLastUpdated &&
+      dayjs(new Date()).diff(new Date(user.waxpeerLastUpdated), "minute") >=
+        maxBotWaitLimitUpdate &&
+      updateItemPrice.length
+    ) {
+      for (let i = 0; i < updateItemPrice.length; i += 50)
+        await updateItemPricesOnWaxPeer(updateItemPrice.slice(i, i + 50));
+      await prisma.user.update({
+        where: {
+          username: "admin",
         },
-      },
-      data: {
-        message: "Updated sucessfully",
-        botSuccess: true,
-      },
-    });
-    if (updateItemPrice.length) {
-      // update items price in batch of maxItemsToUpdate
-      for (let i = 0; i < updateItemPrice.length; i += maxItemsToUpdate)
-        await updateItemPricesOnWaxPeer(
-          updateItemPrice.slice(i, i + maxItemsToUpdate)
-        );
-    }
-    if (listItems.length) {
-      listItemsOnWaxPeer(listItems.slice(0, maxItemsToList));
-    }
+        data: {
+          waxpeerLastUpdated: new Date(),
+        },
+      });
+    } else console.log("Skiiping update...");
+    //do not run if last run from now is less than wait time
+    const maxBotWaitLimitList = settings?.waxpeerRateLimitList || 1;
+    if (
+      user &&
+      user.waxpeerLastListed &&
+      dayjs(new Date()).diff(new Date(user.waxpeerLastListed), "minute") >=
+        maxBotWaitLimitList &&
+      listItems.length
+    ) {
+      listItemsOnWaxPeer(listItems.slice(0, maxItemsToList), settings);
+      await prisma.user.update({
+        where: {
+          username: "admin",
+        },
+        data: {
+          waxpeerLastListed: new Date(),
+        },
+      });
+    } else console.log("Skiiping listing...");
     console.log("waxpeer completed");
   } catch (err) {
     console.error("error in waxpeer!", err);
   }
 }
 
-async function searchItemsInWaxPeer(itemName: string) {
-  const settings = await prisma.settings.findUnique({
-    where: {
-      id: 1,
-    },
-  });
+async function searchItemsInWaxPeer(itemName: string, settings: any) {
   const apiKey: string = settings?.waxpeerApiKey || "";
   let myHeaders = new Headers();
   myHeaders.append("accept", "application/json");
@@ -195,13 +190,11 @@ async function searchItemsInWaxPeer(itemName: string) {
   return items;
 }
 
-async function listItemsOnWaxPeer(items: Array<UpdatedItemsType>) {
+async function listItemsOnWaxPeer(
+  items: Array<UpdatedItemsType>,
+  settings: any
+) {
   try {
-    const settings = await prisma.settings.findUnique({
-      where: {
-        id: 1,
-      },
-    });
     const apiKey: string = settings?.waxpeerApiKey || "";
     let myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");

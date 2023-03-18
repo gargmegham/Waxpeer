@@ -94,7 +94,6 @@ export async function priceEmpireBot() {
           foundAtLeastOnePriceRange = true;
           priceRangeUndercutPercentageThreshold =
             priceRange.priceRangeUndercutPercentageThreshold;
-          console.log("found price range");
           return;
         }
       });

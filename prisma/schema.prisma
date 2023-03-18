@@ -13,7 +13,7 @@ model User {
   name  String?
   password String?
   username String @unique
-  botLastRun DateTime?
+  botRunning Boolean @default(false)
   floatBotLastRun DateTime?
   priceEmpireLastRun DateTime?
   waxpeerLastListed DateTime?
@@ -24,7 +24,8 @@ model Settings {
   id Int @id @default(autoincrement())
   userId Int
   waxpeerApiKey String?
-  waxpeerRateLimit Int @default(1)
+  waxpeerRateLimitList Int @default(1)
+  waxpeerRateLimitUpdate Int @default(1)
   floatBotFrequency Int @default(30)
   priceEmpireApiKey String?
   priceEmpireRateLimit Int @default(1)

@@ -27,7 +27,8 @@ export default async function handle(
         data: {
           waxpeerApiKey: String(values.waxpeerApiKey),
           priceEmpireApiKey: String(values.priceEmpireApiKey),
-          waxpeerRateLimit: values.waxpeerRateLimit,
+          waxpeerRateLimitList: values.waxpeerRateLimitList,
+          waxpeerRateLimitUpdate: values.waxpeerRateLimitUpdate,
           floatBotFrequency: values.floatBotFrequency,
           priceEmpireRateLimit: values.priceEmpireRateLimit,
           paused: Boolean(values.paused),
