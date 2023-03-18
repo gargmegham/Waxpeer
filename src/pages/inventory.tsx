@@ -42,7 +42,7 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
         },
         body: JSON.stringify({ values, items: inventory.items }),
       });
-      message.success("Listing Settings updated!");
+      message.success("Listings added!");
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -189,7 +189,7 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
       {listingModal ? (
         <Modal
           open={listingModal}
-          title="Listing Setting"
+          title="List From Range"
           onCancel={() => setListingModal(false)}
           footer={null}
         >
@@ -259,7 +259,7 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
               <InputNumber min={0} />
             </Form.Item>
             <Button type="primary" htmlType="submit">
-              Save
+              List
             </Button>
           </Form>
         </Modal>

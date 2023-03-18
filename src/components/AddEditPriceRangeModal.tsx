@@ -33,7 +33,7 @@ const AddEditPriceRangeModal: React.FC<any> = ({
         },
         body: JSON.stringify({ values: inputs, id: priceRange.id }),
       });
-      message.success("Item edited successfully!");
+      message.success("Price range edited successfully!");
     } else {
       await fetch("/api/pricerange", {
         method: "POST",
@@ -43,7 +43,7 @@ const AddEditPriceRangeModal: React.FC<any> = ({
         },
         body: JSON.stringify({ values: inputs }),
       });
-      message.success("Item edited successfully!");
+      message.success("Price range added successfully!");
     }
     setShowModal(false);
     setTimeout(() => {

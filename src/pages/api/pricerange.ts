@@ -79,6 +79,23 @@ export default async function handle(
         },
       });
       return res.status(200).json(updatedPriceRange);
+    } else if (req.method === "GET") {
+      // verify bearer token
+      const jwt = require("jsonwebtoken");
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      const decoded = jwt.verify(token, signingKey);
+      if (!decoded) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      await prisma.item.updateMany({
+        data: {
+          listUsing: "price-range",
+        },
+      });
+      return res.status(200).json({});
     }
   } catch (e: any) {
     res.status(500).json({ error: e.message });

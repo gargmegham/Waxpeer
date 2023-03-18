@@ -11,6 +11,7 @@ import { CheckCircleTwoTone, StopTwoTone } from "@ant-design/icons";
 const Listings: React.FC<any> = ({ items }) => {
   const [search, setSearch] = React.useState<string>("");
   const [deleting, setDeleting] = React.useState<boolean>(false);
+  const [switching, setSwitching] = React.useState<boolean>(false);
   const [editItemModalVisible, setEditItemModalVisible] =
     React.useState<boolean>(false);
   const [deleteConfirmModalVisible, setDeleteConfirmModalVisible] =
@@ -46,21 +47,49 @@ const Listings: React.FC<any> = ({ items }) => {
     }
   };
 
+  const switchListMethod = async () => {
+    try {
+      setSwitching(true);
+      await fetch("/api/pricerange", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      message.success("All switched to price range!");
+    } finally {
+      setSwitching(false);
+    }
+  };
+
   return (
     <Layout>
       <Card
         title="Currently Live Bot Trades"
         extra={
-          <Button
-            type="primary"
-            disabled={deleting}
-            loading={deleting}
-            onClick={() => {
-              deleteItem(true);
-            }}
-          >
-            Delete All
-          </Button>
+          <>
+            <Button
+              style={{ marginRight: "10px" }}
+              disabled={switching}
+              loading={switching}
+              onClick={() => {
+                switchListMethod();
+              }}
+            >
+              Switch All To Price Range
+            </Button>
+            <Button
+              type="primary"
+              disabled={deleting}
+              loading={deleting}
+              onClick={() => {
+                deleteItem(true);
+              }}
+            >
+              Delete All
+            </Button>
+          </>
         }
       >
         <Input

@@ -16,6 +16,8 @@ model User {
   botLastRun DateTime?
   floatBotLastRun DateTime?
   priceEmpireLastRun DateTime?
+  waxpeerLastListed DateTime?
+  waxpeerLastUpdated DateTime?
 }
 
 model Settings {
@@ -29,6 +31,7 @@ model Settings {
   source String @default("buff")
   undercutPrice Float @default(0.1)
   undercutPercentage Float @default(1)
+  priceRangeUndercutPercentageThreshold Float?
   undercutByPriceOrPercentage String @default("price")
   paused Boolean @default(false)
   priceRange PriceRange[]
@@ -63,6 +66,7 @@ model Item {
   priceRangeMin Float?
   priceRangeMax Float?
   priceRangePercentage Float?
+  priceRangeUndercutPercentageThreshold Float?
   whenNoOneToUndercutListUsing String?
   botSuccess Boolean @default(false)
   message String @default("Not started yet")
