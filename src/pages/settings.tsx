@@ -358,12 +358,27 @@ const Settings: React.FC<any> = ({ settings }) => {
               ),
             },
             {
+              title: "Undercut By Percentage Above",
+              dataIndex: "priceRangeUndercutPercentageThreshold",
+              render: (text: any, record: any) => (
+                <InputNumber
+                  min={0}
+                  disabled={true}
+                  size="large"
+                  defaultValue={record.priceRangeUndercutPercentageThreshold}
+                  formatter={(value) => `${value}%`}
+                  // @ts-ignore
+                  parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                />
+              ),
+            },
+            {
               title: "Delete",
               dataIndex: "delete",
               render: (text: any, record: any, index: number) => (
                 <>
                   <Button
-                    style={{ marginRight: "16px" }}
+                    style={{ margin: "6px" }}
                     type="primary"
                     onClick={() => {
                       setPriceRangeToEdit(record);
@@ -373,6 +388,7 @@ const Settings: React.FC<any> = ({ settings }) => {
                     Edit
                   </Button>
                   <Button
+                    style={{ margin: "6px" }}
                     type="primary"
                     danger
                     onClick={() => {

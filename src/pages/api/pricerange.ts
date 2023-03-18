@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
 import { signingKey } from "@/constants";
 
-// GET /api/inventory
 export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
@@ -41,13 +40,15 @@ export default async function handle(
       const values = req.body.values;
       const newPriceRange = await prisma.priceRange.create({
         data: {
-          settingsId: 1,
-          sourcePriceMin: values.sourcePriceMin,
+          sourcePriceMin: values.sourcePriceMin || 0,
           sourcePriceMax: values.sourcePriceMax,
           priceRangeMin: values.priceRangeMin,
           priceRangeMax: values.priceRangeMax,
+          priceRangeUndercutPercentageThreshold:
+            values.priceRangeUndercutPercentageThreshold,
           priceRangePercentage: values.priceRangePercentage,
-          whenNoOneToUndercutListUsing: values.whenNoOneToUndercutListUsing,
+          whenNoOneToUndercutListUsing:
+            values.whenNoOneToUndercutListUsing || "percentage",
         },
       });
       return res.status(200).json(newPriceRange);
@@ -69,11 +70,12 @@ export default async function handle(
           id: id,
         },
         data: {
-          settingsId: 1,
           sourcePriceMin: values.sourcePriceMin,
           sourcePriceMax: values.sourcePriceMax,
           priceRangeMin: values.priceRangeMin,
           priceRangeMax: values.priceRangeMax,
+          priceRangeUndercutPercentageThreshold:
+            values.priceRangeUndercutPercentageThreshold,
           priceRangePercentage: values.priceRangePercentage,
           whenNoOneToUndercutListUsing: values.whenNoOneToUndercutListUsing,
         },
@@ -98,6 +100,7 @@ export default async function handle(
       return res.status(200).json({});
     }
   } catch (e: any) {
+    console.log(e);
     res.status(500).json({ error: e.message });
   }
 }

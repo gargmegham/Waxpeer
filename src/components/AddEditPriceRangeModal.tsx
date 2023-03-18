@@ -240,6 +240,35 @@ const AddEditPriceRangeModal: React.FC<any> = ({
                 </Form.Item>
               </Col>
             </Row>
+            <Row gutter={[32, 32]}>
+              <Col span={8}>
+                <Form.Item
+                  label="Undercut By Percentage Above"
+                  name="priceRangeUndercutPercentageThreshold"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Required field!",
+                    },
+                  ]}
+                >
+                  <InputNumber
+                    min={0}
+                    size="large"
+                    defaultValue={
+                      inputs.priceRangeUndercutPercentageThreshold || 0
+                    }
+                    formatter={(value) => `${value}%`}
+                    onChange={(e) => {
+                      setInputs({
+                        ...inputs,
+                        priceRangeUndercutPercentageThreshold: Number(e),
+                      });
+                    }}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
           </Form>
         </Card>
       }

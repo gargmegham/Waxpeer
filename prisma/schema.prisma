@@ -31,7 +31,6 @@ model Settings {
   source String @default("buff")
   undercutPrice Float @default(0.1)
   undercutPercentage Float @default(1)
-  priceRangeUndercutPercentageThreshold Float?
   undercutByPriceOrPercentage String @default("price")
   paused Boolean @default(false)
   priceRange PriceRange[]
@@ -41,11 +40,12 @@ model Settings {
 model PriceRange{
   id Int @id @default(autoincrement())
   settings Settings @relation(fields: [settingsId], references: [id])
-  settingsId Int
+  settingsId Int @default(1)
   sourcePriceMin Float
   sourcePriceMax Float
   priceRangeMin Float
   priceRangeMax Float
+  priceRangeUndercutPercentageThreshold Float
   priceRangePercentage Float
   whenNoOneToUndercutListUsing String
 }
@@ -66,7 +66,7 @@ model Item {
   priceRangeMin Float?
   priceRangeMax Float?
   priceRangePercentage Float?
-  priceRangeUndercutPercentageThreshold Float?
+  priceRangeUndercutPercentageThreshold Float
   whenNoOneToUndercutListUsing String?
   botSuccess Boolean @default(false)
   message String @default("Not started yet")

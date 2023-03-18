@@ -96,6 +96,15 @@ export async function waxPeerBot() {
                   (100 - itemToBeTraded.undercutPercentage)) /
                 100
               : minPriceFromRange - itemToBeTraded.undercutPrice;
+
+          if (
+            itemToBeTraded.undercutByPriceOrPercentage !== "percentage" &&
+            (newPrice / sourcePrice) * 100 >
+              itemToBeTraded.priceRangeUndercutPercentageThreshold
+          )
+            newPrice =
+              (minPriceFromRange * (100 - itemToBeTraded.undercutPercentage)) /
+              100;
         } else if (
           itemToBeTraded.priceRangePercentage &&
           itemToBeTraded.priceRangeMax

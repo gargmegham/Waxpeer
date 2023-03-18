@@ -76,7 +76,8 @@ export async function priceEmpireBot() {
       let priceRangeMin: number = 0,
         priceRangeMax: number = 0,
         priceRangePercentage: number = 0,
-        whenNoOneToUndercutListUsing = "percentage";
+        whenNoOneToUndercutListUsing = "percentage",
+        priceRangeUndercutPercentageThreshold = 0;
 
       let foundAtLeastOnePriceRange = false;
       settings.priceRange.map((priceRange) => {
@@ -91,6 +92,8 @@ export async function priceEmpireBot() {
           whenNoOneToUndercutListUsing =
             priceRange.whenNoOneToUndercutListUsing;
           foundAtLeastOnePriceRange = true;
+          priceRangeUndercutPercentageThreshold =
+            priceRange.priceRangeUndercutPercentageThreshold;
           console.log("found price range");
           return;
         }
@@ -126,6 +129,7 @@ export async function priceEmpireBot() {
               priceRangePercentage,
               undercutPrice: settings.undercutPrice,
               undercutPercentage: settings.undercutPercentage,
+              priceRangeUndercutPercentageThreshold,
               undercutByPriceOrPercentage: settings.undercutByPriceOrPercentage,
               priceRangeMin,
               botSuccess: true,

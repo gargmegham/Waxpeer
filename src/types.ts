@@ -44,6 +44,7 @@ export type ItemInDb = {
   whenNoOneToUndercutListUsing: string | null;
   botSuccess: boolean;
   message: string;
+  priceRangeUndercutPercentageThreshold: number;
   floatCondition: number | null;
   currentPrice: number;
   listingPercentage: number;
@@ -111,6 +112,7 @@ export type PriceRange = {
   priceRangeMin: number;
   priceRangeMax: number;
   priceRangePercentage: number;
+  priceRangeUndercutPercentageThreshold: number;
   whenNoOneToUndercutListUsing: string;
 };
 

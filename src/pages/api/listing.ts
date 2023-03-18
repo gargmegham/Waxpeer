@@ -25,7 +25,6 @@ async function getAllItemPrices(source: string) {
   }
 }
 
-// GET /api/listing
 export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
@@ -86,6 +85,7 @@ export default async function handle(
               latestSourcePrices[item.name][updatedSettings.source].price / 100,
             undercutPrice: updatedSettings.undercutPrice,
             undercutPercentage: updatedSettings.undercutPercentage,
+            priceRangeUndercutPercentageThreshold: 0,
             undercutByPriceOrPercentage:
               updatedSettings.undercutByPriceOrPercentage,
             listUsing: values.listUsing,

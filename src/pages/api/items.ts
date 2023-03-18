@@ -84,6 +84,7 @@ export default async function handle(
             item_id: String(item.item_id),
             source: settings.source,
             undercutPrice: settings.undercutPrice,
+            priceRangeUndercutPercentageThreshold: 0,
             undercutPercentage: settings.undercutPercentage,
             undercutByPriceOrPercentage: settings.undercutByPriceOrPercentage,
           },
@@ -119,6 +120,8 @@ export default async function handle(
           undercutPercentage: item.undercutPercentage,
           undercutByPriceOrPercentage: item.undercutByPriceOrPercentage,
           priceRangeMin: item.priceRangeMin,
+          priceRangeUndercutPercentageThreshold:
+            item.priceRangeUndercutPercentageThreshold,
           priceRangeMax: item.priceRangeMax,
           priceRangePercentage: item.priceRangePercentage,
           whenNoOneToUndercutListUsing: item.whenNoOneToUndercutListUsing,
