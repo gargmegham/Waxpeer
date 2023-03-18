@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgres"
-  url      = "postgres://postgres:asdfghjkl12@pricebot.cwlwcgfag559.us-east-1.rds.amazonaws.com:5432/pricebot"
+  url      = "postgres://postgres:@localhost:5432/pricebot"
 }
 
 model User {

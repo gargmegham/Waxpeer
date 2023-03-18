@@ -8,3 +8,11 @@ services:
     ports:
       - 3000:3000
     restart: unless-stopped
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    restart: unless-stopped
