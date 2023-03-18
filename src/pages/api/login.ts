@@ -13,22 +13,35 @@ export default async function handle(
     }
     const username: string = req.body.username;
     const password: string = req.body.password;
-    const result: any = await prisma.user.findUnique({
-      where: {
-        username: username,
-      },
-      select: {
-        username: true,
-        email: true,
-        password: true,
-        name: true,
-      },
-    });
-    if (!result) {
-      return res.status(401).json({ error: "Incorrect username" });
-    }
-    if (result.password !== password) {
-      return res.status(401).json({ error: "Incorrect password" });
+    const signup: boolean = req.body.signup;
+    if (!signup) {
+      const result: any = await prisma.user.findUnique({
+        where: {
+          username: username,
+        },
+        select: {
+          username: true,
+          password: true,
+        },
+      });
+      if (!result) {
+        return res.status(401).json({ error: "Incorrect username" });
+      }
+      if (result.password !== password) {
+        return res.status(401).json({ error: "Incorrect password" });
+      }
+    } else {
+      await prisma.user.create({
+        data: {
+          username,
+          password,
+        },
+      });
+      await prisma.settings.create({
+        data: {
+          userId: 1,
+        },
+      });
     }
     // create a jwt for user
     const jwt = require("jsonwebtoken");

@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import Router from "next/router";
+import { GetServerSideProps } from "next";
+import prisma from "@/lib/prisma";
 import { Spin } from "antd";
 import styles from "@/styles/Login.module.css";
 
-const Login: React.FC = () => {
+export type LoginProps = {
+  signup: boolean;
+};
+
+const Login: React.FC<LoginProps> = ({ signup }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -12,7 +18,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const body = { username, password };
+      const body = { username, password, signup };
       const res = await fetch(`/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -63,12 +69,21 @@ const Login: React.FC = () => {
             className={styles.cta}
             disabled={!username || !password}
             type="submit"
-            value="Login"
+            value={signup ? "Signup" : "Login"}
           />
         )}
       </form>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const numberOfUsers: number = await prisma.user.count({
+    where: { username: "admin" },
+  });
+  return {
+    props: { signup: numberOfUsers === 0 },
+  };
 };
 
 export default Login;

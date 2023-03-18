@@ -9,8 +9,6 @@ datasource db {
 
 model User {
   id Int @id @default(autoincrement())
-  email String  @unique
-  name  String?
   password String?
   username String @unique
   botRunning Boolean @default(false)

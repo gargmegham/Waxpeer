@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { Button } from "antd";
 import { useRouter } from "next/router";
 import styles from "@/components/Header.module.css";
 
@@ -10,6 +11,11 @@ const Header: React.FC = () => {
 
   return (
     <nav>
+      <Link href="/" legacyBehavior>
+        <Button danger type="primary" onClick={() => localStorage.clear()}>
+          Logout
+        </Button>
+      </Link>
       <div className={styles.right}>
         <Link href="/listings" legacyBehavior>
           <a className={isActive("/listings") ? styles.bold : ""}>Listings</a>
