@@ -131,11 +131,12 @@ export async function waxPeerBot() {
     //do not run if last run from now is less than wait time
     const maxBotWaitLimitUpdate = settings?.waxpeerRateLimitUpdate || 1;
     if (
-      user &&
-      user.waxpeerLastUpdated &&
-      dayjs(new Date()).diff(new Date(user.waxpeerLastUpdated), "minute") >=
-        maxBotWaitLimitUpdate &&
-      updateItemPrice.length
+      (user && !user.waxpeerLastUpdated) ||
+      (user &&
+        user.waxpeerLastUpdated &&
+        dayjs(new Date()).diff(new Date(user.waxpeerLastUpdated), "minute") >=
+          maxBotWaitLimitUpdate &&
+        updateItemPrice.length)
     ) {
       for (let i = 0; i < updateItemPrice.length; i += 50)
         await updateItemPricesOnWaxPeer(updateItemPrice.slice(i, i + 50));
@@ -151,11 +152,12 @@ export async function waxPeerBot() {
     //do not run if last run from now is less than wait time
     const maxBotWaitLimitList = settings?.waxpeerRateLimitList || 1;
     if (
-      user &&
-      user.waxpeerLastListed &&
-      dayjs(new Date()).diff(new Date(user.waxpeerLastListed), "minute") >=
-        maxBotWaitLimitList &&
-      listItems.length
+      (user && !user.waxpeerLastListed) ||
+      (user &&
+        user.waxpeerLastListed &&
+        dayjs(new Date()).diff(new Date(user.waxpeerLastListed), "minute") >=
+          maxBotWaitLimitList &&
+        listItems.length)
     ) {
       listItemsOnWaxPeer(listItems.slice(0, maxItemsToList), settings);
       await prisma.user.update({
