@@ -6,7 +6,6 @@ const mainBotJob = cronSchedule(mainBot);
 
 let taskArray: any[] = [];
 
-// GET /api/activatebot
 export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
