@@ -95,9 +95,7 @@ const AddEditPriceRangeModal: React.FC<any> = ({
                     min={0}
                     size="large"
                     defaultValue={inputs.sourcePriceMin || 0}
-                    formatter={(value) =>
-                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
+                    formatter={(value) => `$ ${value}`}
                     onChange={(e) => {
                       setInputs({
                         ...inputs,
@@ -122,9 +120,7 @@ const AddEditPriceRangeModal: React.FC<any> = ({
                     min={0}
                     size="large"
                     defaultValue={inputs.sourcePriceMax || 0}
-                    formatter={(value) =>
-                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
+                    formatter={(value) => `$ ${value}`}
                     onChange={(e) => {
                       setInputs({
                         ...inputs,

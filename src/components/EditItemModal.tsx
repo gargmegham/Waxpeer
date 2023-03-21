@@ -92,9 +92,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                   min={0}
                   size="large"
                   defaultValue={inputs.undercutPrice}
-                  formatter={(value) =>
-                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
+                  formatter={(value) => `$ ${value}`}
                   onChange={(e) => {
                     inputs.undercutPrice = Number(e);
                   }}
@@ -172,9 +170,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                   min={0}
                   size="large"
                   defaultValue={inputs.priceRangeMin}
-                  formatter={(value) =>
-                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
+                  formatter={(value) => `$ ${value}`}
                   onChange={(e) => {
                     inputs.priceRangeMin = Number(e);
                   }}
@@ -196,9 +192,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                   min={0}
                   size="large"
                   defaultValue={inputs.priceRangeMax}
-                  formatter={(value) =>
-                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
+                  formatter={(value) => `$ ${value}`}
                   onChange={(e) => {
                     inputs.priceRangeMax = Number(e);
                   }}

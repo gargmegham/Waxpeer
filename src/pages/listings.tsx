@@ -204,11 +204,7 @@ const Listings: React.FC<any> = ({ items }) => {
                     size="large"
                     disabled={true}
                     defaultValue={sourcePrice || "-"}
-                    formatter={(value) =>
-                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
-                    // @ts-ignore
-                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                    formatter={(value) => `$ ${value}`}
                   />
                 );
               },
@@ -226,11 +222,7 @@ const Listings: React.FC<any> = ({ items }) => {
                     size="large"
                     disabled={true}
                     defaultValue={sourcePrice || "-"}
-                    formatter={(value) =>
-                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
-                    // @ts-ignore
-                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                    formatter={(value) => `$ ${value}`}
                   />
                 );
               },
@@ -249,11 +241,7 @@ const Listings: React.FC<any> = ({ items }) => {
                     size="large"
                     disabled={true}
                     defaultValue={priceRangeMin || "-"}
-                    formatter={(value) =>
-                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
-                    // @ts-ignore
-                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                    formatter={(value) => `$ ${value}`}
                   />
                 );
               },
@@ -271,11 +259,7 @@ const Listings: React.FC<any> = ({ items }) => {
                     size="large"
                     disabled={true}
                     defaultValue={priceRangeMax || "-"}
-                    formatter={(value) =>
-                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
-                    // @ts-ignore
-                    parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                    formatter={(value) => `$ ${value}`}
                   />
                 );
               },

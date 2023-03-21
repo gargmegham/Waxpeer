@@ -138,9 +138,7 @@ const Settings: React.FC<any> = ({ settings }) => {
                 <InputNumber
                   min={0}
                   size="large"
-                  formatter={(value) =>
-                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
+                  formatter={(value) => `$ ${value}`}
                   // @ts-ignore
                   parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                 />
@@ -281,9 +279,7 @@ const Settings: React.FC<any> = ({ settings }) => {
                   size="large"
                   disabled={true}
                   defaultValue={record.sourcePriceMin}
-                  formatter={(value) =>
-                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
+                  formatter={(value) => `$ ${value}`}
                   // @ts-ignore
                   parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                 />
@@ -298,9 +294,7 @@ const Settings: React.FC<any> = ({ settings }) => {
                   disabled={true}
                   size="large"
                   defaultValue={record.sourcePriceMax}
-                  formatter={(value) =>
-                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
+                  formatter={(value) => `$ ${value}`}
                   // @ts-ignore
                   parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                 />
