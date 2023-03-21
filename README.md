@@ -1,18 +1,5 @@
 # SETUP
 
-## Run On Server Using Docker
-
-- Download docker on your system https://docs.docker.com/desktop/install/windows-install/
-- If you encounter any problem related to virtualisation in bios enable virtualisation in your bios
-- if any error related to wsl Open PowerShell as administrator ans run
-  `wsl --update`
-- `docker-compose up -d --build`
-
-## Run Locally Using Node
-
-- open powershell in bot directory
-- run `npm run dev`
-
 ## For First Time Setup
 
 - Download and install node using https://nodejs.org/en/download/
@@ -21,7 +8,32 @@
   Username: 'postgres'
   Password: ''
   Database Name: 'pricebot'
-- Or modify datasource in prisma/schema.prisma to use different database source
-- Make sure you have node installed in you system with following command `node --version` `npm --version`
+  To create a database you can follow this blog: https://www.sqlshack.com/how-to-install-postgresql-on-windows/
+- Or to use different database source modify datasource in prisma/schema.prisma (Optional)
+- Make sure you have node installed in you system with following command
+  `node --version`
+  `npm --version`
 - Install dependecies with `npm install`
-- Migrate tables with `npx prisma migrate dev`
+- Create and migrate tables with `npx prisma migrate dev`
+
+## Run Locally Using Node
+
+- open powershell and go to code location then run `npm run dev`
+
+## Run On Server
+
+### Using Docker
+
+- Download docker on your system https://docs.docker.com/desktop/install/windows-install/
+- If you encounter any problem related to virtualisation in bios enable virtualisation in your bios
+- if any error related to wsl Open PowerShell as administrator ans run
+  `wsl --update`
+- finally you can run `docker-compose up -d --build`
+
+### Using pm2
+
+- `npm install pm2 -g`
+- `npm run build`
+- `pm2 start npm --name "next-js" -- start`
+- `pm2 startup`
+- `pm2 save`
