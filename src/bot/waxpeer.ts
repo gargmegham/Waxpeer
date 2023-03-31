@@ -32,6 +32,10 @@ export async function waxPeerBot() {
 
     //do not change this loop to forEach or map there is synchronous issue
     for (const itemToBeTraded of itemsNeedTobeTraded) {
+      const itemIdsWithSameName = itemsNeedTobeTraded
+        .filter((item) => item.name === itemToBeTraded.name)
+        .map((item) => item.item_id);
+
       if (
         !itemToBeTraded.sourcePrice ||
         ((!itemToBeTraded.priceRangeMin ||
@@ -68,7 +72,7 @@ export async function waxPeerBot() {
               : 0)) /
             1000 <
             itemToBeTraded.priceRangeMax &&
-          item.item_id !== itemToBeTraded.item_id
+          !itemIdsWithSameName.includes(item.item_id)
       );
       let newPrice = 0;
 
