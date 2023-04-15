@@ -2,6 +2,12 @@
 
 ## For First Time Setup
 
+- Create a `.env.local` file in the root directory of this project with following keys
+
+  ```
+  SIGNATURE=
+  ```
+
 - Download and install node using https://nodejs.org/en/download/
 - Download and install PostgreSQL using https://www.postgresql.org/download/
 - You'll need to create a local database in postgres with following details

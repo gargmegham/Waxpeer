@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
-import { signingKey } from "@/constants";
 
 // Required fields in body: username, password
 export default async function handle(
@@ -45,7 +44,7 @@ export default async function handle(
     }
     // create a jwt for user
     const jwt = require("jsonwebtoken");
-    const token = jwt.sign({ username }, signingKey, {
+    const token = jwt.sign({ username }, process.env.SIGNATURE, {
       expiresIn: "6h",
     });
     return res.status(201).json({ token });

@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
-import { signingKey } from "@/constants";
 import { Item } from "@/types";
 
 async function getAllItemPrices(source: string) {
@@ -37,7 +36,7 @@ export default async function handle(
       if (!token) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const decoded = jwt.verify(token, signingKey);
+      const decoded = jwt.verify(token, process.env.SIGNATURE);
       if (!decoded) {
         return res.status(401).json({ error: "Unauthorized" });
       }

@@ -69,4 +69,3 @@ export const availableSources = [
   "youpin_rmb",
   "mannco",
 ];
-export const signingKey = "5687w7tfugyewtrf76%^&%$R^UY5&$%7697821689326192836";

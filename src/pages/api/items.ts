@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { signingKey } from "@/constants";
 import prisma from "@/lib/prisma";
 import { Item } from "@/types";
 
@@ -61,7 +60,7 @@ export default async function handle(
       if (!token) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const decoded = jwt.verify(token, signingKey);
+      const decoded = jwt.verify(token, process.env.SIGNATURE);
       if (!decoded) {
         return res.status(401).json({ error: "Unauthorized" });
       }
@@ -100,7 +99,7 @@ export default async function handle(
       if (!token) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const decoded = jwt.verify(token, signingKey);
+      const decoded = jwt.verify(token, process.env.SIGNATURE);
       if (!decoded) {
         return res.status(401).json({ error: "Unauthorized" });
       }
@@ -137,7 +136,7 @@ export default async function handle(
       if (!token) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const decoded = jwt.verify(token, signingKey);
+      const decoded = jwt.verify(token, process.env.SIGNATURE);
       if (!decoded) {
         return res.status(401).json({ error: "Unauthorized" });
       }
