@@ -1,6 +1,27 @@
-# SETUP
+## Overview
 
-## For First Time Setup
+Features:
+* Login/Logout
+* Listing tab, inventory tab and a settings tab
+* Add items from your inventory to listings using either from within a price range, add selected items or add all items at once
+* From settings you can configure:
+  - waxpeer API key
+  - pricempire API key
+  - API rate limits
+  - frequency at which it lists
+  - running/paused state
+  - undercut by price
+  - undercut by percentage
+  - source for base price from priceempire
+  - you can also specify different undercut prices for items within different price ranges
+* From listings tab you can
+  - Edit/Delete a listing
+  - Read log for a listing
+
+
+## Setup
+
+### For First Time Setup
 
 - Create a `.env.local` file in the root directory of this project with following keys
 
@@ -22,24 +43,14 @@
 - Install dependecies with `npm install`
 - Create and migrate tables with `npx prisma migrate dev`
 
-## Run Locally Using Node
+### Run Locally Using `npm`
 
 - open powershell and go to code location then run `npm run dev`
 
-## Run On Server
-
-### Using Docker
+### Run On Server Using Docker
 
 - Download docker on your system https://docs.docker.com/desktop/install/windows-install/
 - If you encounter any problem related to virtualisation in bios enable virtualisation in your bios
 - if any error related to wsl Open PowerShell as administrator ans run
   `wsl --update`
 - finally you can run `docker-compose up -d --build`
-
-### Using pm2
-
-- `npm install pm2 -g`
-- `npm run build`
-- `pm2 start npm --name "next-js" -- start`
-- `pm2 startup`
-- `pm2 save`
