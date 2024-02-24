@@ -64,19 +64,21 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
       });
       let data = await res.json();
       data.items = data.items
-        .map((item: Item) => {
-          return {
-            ...item,
-            key: item.item_id,
-            active: activeItems.some(
-              (activeItem: ActiveItem) =>
-                String(activeItem.item_id) === String(item.item_id)
-            )
-              ? "Active"
-              : "Inactive",
-          };
-        })
-        .filter((item: Item) => item.active === "Inactive");
+        ? data.items
+            .map((item: Item) => {
+              return {
+                ...item,
+                key: item.item_id,
+                active: activeItems.some(
+                  (activeItem: ActiveItem) =>
+                    String(activeItem.item_id) === String(item.item_id)
+                )
+                  ? "Active"
+                  : "Inactive",
+              };
+            })
+            .filter((item: Item) => item.active === "Inactive")
+        : [];
       setInventory(data);
       setLoading(false);
     };
