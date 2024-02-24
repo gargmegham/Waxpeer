@@ -2,7 +2,15 @@
 
 This repository is a CSGO Steam Seller Bot built for the Waxpeer platform. It provides features such as login/logout, listing management, inventory management, and settings configuration. The bot allows users to add items from their inventory to listings, set API keys and rate limits, specify undercut prices, and more. The setup instructions include creating a .env.local file, installing Node.js and PostgreSQL, and running migrations. The bot can be run locally using npm or on a server using Docker.
 
-Features:
+### Demos
+
+- ![Screenshot 2024-02-24 at 11 45 17 PM](https://github.com/gargmegham/Waxpeer/assets/95271253/84985d17-0ce3-46d2-be0b-89562164c1e6)
+
+- ![Screenshot 2024-02-24 at 11 45 11 PM](https://github.com/gargmegham/Waxpeer/assets/95271253/f4925bec-d35c-4af2-9698-d8ca5aa57ba3)
+
+- ![Screenshot 2024-02-24 at 11 44 56 PM](https://github.com/gargmegham/Waxpeer/assets/95271253/ee1884f4-e1bf-4821-b2fa-dfeed4c16417)
+
+### Features:
 
 - Login/Logout
 - Listing tab, inventory tab and a settings tab
