@@ -52,10 +52,6 @@ const MyInventory: React.FC<MyInventoryProps> = ({ activeItems, settings }) => {
   };
 
   React.useEffect(() => {
-    fetch(`/api/activatebot`);
-  }, []);
-
-  React.useEffect(() => {
     const fetchInventory = async () => {
       setLoading(true);
       const token = localStorage.getItem("token");

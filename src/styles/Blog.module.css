@@ -7,6 +7,6 @@
   box-shadow: 1px 1px 3px #aaa;
 }
 
-.post + .post {
+.post+.post {
   margin-top: 2rem;
 }

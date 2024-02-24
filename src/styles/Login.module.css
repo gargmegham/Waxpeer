@@ -5,6 +5,7 @@
   height: 100vh;
   justify-content: center;
 }
+
 .input {
   display: block;
   padding: 1rem;
@@ -12,6 +13,7 @@
   border-radius: 8px;
   width: 300px;
 }
+
 .cta {
   display: block;
   background-color: rgb(239, 164, 43) !important;

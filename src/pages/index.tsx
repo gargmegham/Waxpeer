@@ -25,7 +25,6 @@ const Login: React.FC<LoginProps> = ({ signup }) => {
         body: JSON.stringify(body),
       });
       const data = await res.json();
-      await fetch(`/api/activatebot`);
       if (data.error) {
         alert(data.error);
         return;

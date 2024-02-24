@@ -11,7 +11,7 @@ dayjs.extend(relativeTime);
 export async function mainBot() {
   const start = Date.now();
   try {
-    console.log("mainBot started...");
+    console.log("Starting mainBot...");
     const user = await prisma.user.findUnique({
       where: {
         username: "admin",

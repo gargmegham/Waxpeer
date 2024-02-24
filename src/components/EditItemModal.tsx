@@ -18,7 +18,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   showModal,
   selectedItem,
 }) => {
-  const [inputs, setInputs] = React.useState<SelectedItem>(selectedItem);
+  const [inputs, _] = React.useState<SelectedItem>(selectedItem);
   const [editing, setEditing] = React.useState<boolean>(false);
 
   const submit = async () => {

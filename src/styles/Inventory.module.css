@@ -1,6 +1,7 @@
 .back {
   margin-left: 1rem;
 }
+
 .post {
   background: white;
   transition: box-shadow 0.1s ease-in;
@@ -10,6 +11,6 @@
   box-shadow: 1px 1px 3px #aaa;
 }
 
-.post + .post {
+.post+.post {
   margin-top: 2rem;
 }
