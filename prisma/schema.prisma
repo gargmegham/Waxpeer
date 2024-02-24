@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgres"
-  url      = "postgres://postgres:@localhost:5432/pricebot"
+  url      = env("NEXT_PRIVATE_DATABASE_URL")
 }
 
 model User {
