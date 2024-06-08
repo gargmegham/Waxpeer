@@ -1,6 +1,6 @@
 # Waxpeer Seller Bot [NOT MAINTAINED ANYMORE]
 
-- [**ShieldPeer**](http://shieldpeer.in/)
+- Use [**ShieldPeer**](http://shieldpeer.in/) instead
 
 This repository is a CSGO Steam Seller Bot built for the Waxpeer platform. It provides features such as login/logout, listing management, inventory management, and settings configuration. The bot allows users to add items from their inventory to listings, set API keys and rate limits, specify undercut prices, and more. The setup instructions include creating a .env.local file, installing Node.js and PostgreSQL, and running migrations. The bot can be run locally using npm or on a server using Docker.
 
